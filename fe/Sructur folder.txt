@@ -1,0 +1,36 @@
+src/
+│── assets/              # gambar, ikon
+│
+│── components/          # komponen umum (button, modal, navbar, dll)
+│   ├── ui/              # reusable UI
+│   ├── layout/          # sidebar, header
+│   └── charts/          # komponen chart buat reporting
+│
+│── pages/
+│   ├── Auth/            # login, register
+│   ├── Dashboard/       # kumpulan dashboard
+│   │   ├── Admin/
+│   │   ├── Staff/
+│   │   ├── Supplier/
+│   │   └── Customer/
+│   ├── Product/         # Product UI (CRUD barang/lihat barang)
+│   ├── Payment/         # UI untuk transaksi & payment gateway
+│   └── Reporting/       # laporan, grafik, export data
+│
+│── services/            # API call
+│   ├── auth.js
+│   ├── product.js
+│   ├── transaction.js
+│   ├── report.js
+│   └── user.js
+│
+│── context/             # AuthContext, RoleContext
+│
+│── hooks/               # useAuth, useRole, useFetch, dll
+│
+│── utils/               # formatter tanggal, angka, dll
+│
+│── styles/              # global css
+│
+│── App.jsx              # routing utama (react-router-dom)
+│── main.jsx             # entry point
