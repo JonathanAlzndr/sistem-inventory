@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Auth/Login";
+import './App.css'
 import AdminDashboard from "./pages/Dasboard/admin/AdminDashboard";
 import KasirDashboard from "./pages/Dasboard/kasir/KasirDashboard";
 import GudangDashboard from "./pages/Dasboard/gudang/GudangDashboard";
