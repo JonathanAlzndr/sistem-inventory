@@ -1,8 +1,11 @@
 export default function OwnerDashboard() {
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">Dashboard Owner</h1>
-      <p className="text-gray-600">Halaman khusus Owner</p>
+   
+   <div className="flex">
+    <section>dc</section>
+    <nav>d</nav>
+   </div>
     </div>
   );
 }

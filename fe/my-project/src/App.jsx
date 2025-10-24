@@ -1,19 +1,19 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Auth/Login";
-import './App.css'
-import AdminDashboard from "./pages/Dasboard/admin/AdminDashboard";
+import "./App.css";
+
 import KasirDashboard from "./pages/Dasboard/kasir/KasirDashboard";
 import GudangDashboard from "./pages/Dasboard/gudang/GudangDashboard";
 import OwnerDashboard from "./pages/Dasboard/owner/OwnerDashboard";
-
+import RoleLogin from "./pages/Auth/RoleLogin";
 function App() {
   return (
     <Routes>
-        <Route path="/" element={<Login />} />
-      <Route path="/dashboard/admin" element={<AdminDashboard />} />
-      <Route path="/dashboard/kasir" element={<KasirDashboard />} />
-      <Route path="/dashboard/gudang" element={<GudangDashboard />} />
-      <Route path="/dashboard/owner" element={<OwnerDashboard />} />
+      <Route path="/Role" element={<RoleLogin />} />
+      <Route path="/Login" element={<Login />} />
+      <Route path="/kasir" element={<KasirDashboard />} />
+      <Route path="/gudang" element={<GudangDashboard />} />
+      <Route path="/owner" element={<OwnerDashboard />} />
     </Routes>
   );
 }

@@ -70,7 +70,7 @@ export default function Login() {
               type="submit"
               className="flex justify-center items-center gap-3 w-[117px] bg-[#22BE5B] text-white py-2 rounded-[10px] hover:bg-blue-700 transition"
             >
-              Login
+              Masuk
               <FaArrowRightLong />
             </button>
           </form>
@@ -79,7 +79,7 @@ export default function Login() {
         <div className="text-white text-center bg-linear-to-b from-[#16A34A] to-[#31E272] h-full w-[450px]  rounded-bl-[20px] rounded-tl-[20px] rounded-[10px]">
           <div className="flex flex-col justify-center items-center py-23">
             <h2 className="text-[24px] font-bold">
-              Sistem Manajemen Inventaris
+              Sistem Pencatatn berdasarkan
             </h2>
             <h1 className="text-[30px] font-semibold">CR.JAYA</h1>
             <img src={gambar} alt="" />
