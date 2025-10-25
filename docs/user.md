@@ -5,6 +5,9 @@
 **Description:**
 User login to the system
 
+**Access:**
+All Users
+
 ### Endpoint : `POST /api/auth/login`
 
 #### Request Body :

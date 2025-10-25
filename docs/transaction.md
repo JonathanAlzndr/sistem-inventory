@@ -88,7 +88,7 @@ Retrieve Transaction History
 Required (Bearer Token)
 
 **Access:**
-Cashier
+Cashier, Owner
 
 ### Endpoint: `GET api/transaction`
 
