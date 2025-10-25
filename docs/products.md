@@ -8,6 +8,9 @@ Retrieve a list of all available products.
 **Authorization:**  
 Required (Bearer Token)
 
+**Access:**
+All Users
+
 ### Endpoint : `GET api/products?page=1&size=10&weight=5`
 
 ### Query Parameters (Optional)
@@ -62,6 +65,9 @@ Retrieve a product.
 **Authorization:**  
 Required (Bearer Token)
 
+**Access:**
+Staff
+
 ### Endpoint : `GET api/products/{productId}`
 
 ### Path Variable
@@ -97,6 +103,9 @@ Delete a product by Id
 **Authorization:**  
 Required (Bearer Token)
 
+**Access:**
+Staff
+
 ### Endpoint `DELETE api/products/{productId}`
 
 ### Path Variable
@@ -128,6 +137,9 @@ Update partial or full data for a specific product
 
 **Authorization:**  
 Required (Bearer Token)
+
+**Access:**
+Staff
 
 ### Endpoint `PATCH api/products/{productId}`
 
@@ -173,6 +185,9 @@ Create a new product.
 
 **Authorization:**  
 Required (Bearer Token)
+
+**Access:**
+Staff
 
 ### Endpoint : `POST api/products`
 
