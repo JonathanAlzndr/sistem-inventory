@@ -1,123 +1,206 @@
-# Product API Spec
+# Product API Specification
 
 ## Get All Products
-- **Description:** Get All Products
-- **Endpoint:** GET /api/products
-- **Authorization**: Required
 
-- **Query Parameters (Optional):**
-  
-| Parameter | Type | Description |
-|---|---|---|
-| `page` | `int` | Page number for pagination (default: 1). |
-| `size` | `int` | Number of products per page (default: 10). |
-| `category` | `string` | Filter products by category name. |                  |
+**Description:**  
+Retrieve a list of all available products.
+
+**Authorization:**  
+Required (Bearer Token)
+
+### Endpoint : `GET api/products?page=1&size=10&weight=5`
+
+### Query Parameters (Optional)
+
+| Parameter   | Type     | Description                                      |
+|--------------|----------|--------------------------------------------------|
+| `page`       | `int`    | Page number for pagination (default: `1`).      |
+| `size`       | `int`    | Number of products per page (default: `10`).    |
+| `weight`   | `int` | Filter products by weight.               |
 
 ### Response Body (Success):
-```json {
+```json 
+{
+    "msg": "Success",
     "productList": [
         {
-            "productName": "abc",
-            "receivedDate": "12/10/2025",
-            "category": "10kg",
-            "currentStock": "20",
-            "status": "Aman"
+            "productId": "10",
+            "productName": "Beras A",
+            "receivedDate": "2025-10-25T11:15:33Z",
+            "weight": 20,
+            "currentStock": 112,
+            "status": "Aman",
+            "price": "15000.00"
         },
         {
-            "productName": "abcd",
-            "receivedDate": "12/10/2025",
-            "category": "20kg",
-            "currentStock": "25",
-            "status": "Menipis"
+            "productId": "10",
+            "productName": "Beras A",
+            "receivedDate": "2025-10-25T11:15:33Z",
+            "weight": 20,
+            "currentStock": 112,
+            "status": "Aman",
+            "price": "15500.00"
         },
-    ]
-}```
+    ],
+}
+```
 
-### Response Body (Failed): 
-```json{
-    "msg": "Failed to fetch products"
-}```
+### Response Body (Failed):
+```json 
+{
+    "msg": "Failed",
+    "productList": []
+}
+```
+---
 
+## Get Product by Id
+
+**Description:**  
+Retrieve a product.
+
+**Authorization:**  
+Required (Bearer Token)
+
+### Endpoint : `GET api/products/{productId}`
+
+### Path Variable
+| Parameter   | Type | Description |
+|--------------|------|-------------|
+| `productId`  | `int` | The ID of the product to fetch |
+
+### Response Body (Success) :
+
+``` json 
+{
+    "msg": "Success",
+    "product": 
+    {
+        "productId": "10",
+        "productName": "Beras A",
+        "receivedDate": "2025-10-25T11:15:33Z",
+        "weight": 20,
+        "currentStock": 112,
+        "status": "Aman",
+        "price": "15500.00"
+    }
+}
+```
+
+---
 
 ## Delete Product by Id
 
-- **Description:** Delete a product by Id
-- **Endpoint:** DELETE api/products/{productId}
-- **Authorization:** Required
+**Description:**  
+Delete a product by Id
 
-- ** Request Parameters:**
+**Authorization:**  
+Required (Bearer Token)
 
-| Parameter | Type   | Required | Description                  |
-|-----------|--------|----------|------------------------------|
-| `productId`  | `Int` | Yes      | The ID of the product to fetch  |
+### Endpoint `DELETE api/products/{productId}`
+
+### Path Variable
+| Parameter   | Type | Description |
+|--------------|------|-------------|
+| `productId`  | `int` | The ID of the product to delete |
 
 
-Response body (Success):
-```json{
+### Response body (Success):
+```json 
+{
     "msg": "Success to delete product"
-}```
+}
+```
 
-Response body (Failed)
-```json{
+### Response body (Failed)
+```json 
+{
     "msg": "Failed to delete product"
-}```
+}
+```
 
+---
 
-## Edit Product 
+## Edit Product by Id
 
-- **Description:** Delete a product by Id
-- **Endpoint:** PATCH api/products/{productId}
-- **Authorization:** Required
+**Description:**  
+Update partial or full data for a specific product
 
-- ** Request Parameters:**
+**Authorization:**  
+Required (Bearer Token)
+
+### Endpoint `PATCH api/products/{productId}`
+
+### Path Variable
 
 | Parameter | Type   | Required | Description                  |
 |-----------|--------|----------|------------------------------|
 | `productId`  | `Int` | Yes      | The ID of the product to edit |
 
-Request Body: 
-```json{
+#### Request Body (All fields below are optional. Send only the fields you want to update): 
+```json
+{
     "productName": "Beras A",
+    "receivedDate": "2025-10-25T11:15:33Z",
+    "weight": 10,
+    "currentStock": 12,
     "status": "Aman",
-    "category": "10kg",
-    "stok": 10,
-}```
+    "sellPrice": "1800.00",
+    "purchasePrice": "14000.00"
+}
+```
 
-Response body (Success):
-```json{
+### Response body (Success):
+``` json
+{
     "msg": "Success to update product"
-}```
+}
+```
 
-Response body (Failed)
-```json{
-    "msg": "Failed to update product"
-}```
+### Response body (Failed)
+``` json
+{
+    "msg": "Product is not found"
+}
+```
 
-## Create Product
+---
 
-- **Description:** Create new product
-- **Endpoint:** POST api/products/
-- **Authorization:** Required
+## Create a new Product
 
-Request Body: 
-```json{
-    "productName": "Beras A",
-    "status": "Aman",
-    "category": "10kg",
-    "stok": 10,
-}```
+**Description:**  
+Create a new product.
 
-Response body (Success):
-```json{
+**Authorization:**  
+Required (Bearer Token)
+
+### Endpoint : `POST api/products`
+
+### Request Body: 
+``` json
+{
+    "productName": "beras A",
+    "receivedDate": "2025-10-25T11:15:33Z",
+    "weight": 12,
+    "currentStock": 13,
+    "sellPrice": "15000.00",
+    "purchasePrice": "10000.00",
+}
+```
+
+### Response body (Success):
+```json
+{
     "msg": "Success to create new product"
-}```
+}
+```
 
-Response body (Failed)
-```json{
+### Response body (Failed)
+``` json
+{
     "msg": "Failed to create new product"
-}```
-
-
+}
+```
 
 
 

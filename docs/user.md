@@ -1,26 +1,33 @@
-# User API Spec
+# User API Specification
 
 ## Login
 
-Endpoint : POST /api/auth/login
+**Description:**
+User login to the system
 
-Request Body :
-``` json {
+### Endpoint : `POST /api/auth/login`
+
+#### Request Body :
+```json
+{
     "username": "John Doe",
-    "password": "secret123",
+    "password": "secret",
+} 
+```
+
+#### Response Body (Success) :
+```json
+{
+    "msg": "success",
+    "token": "jwt"
 }
 ```
 
-Response Body (Success) :
-```json {
-    "msg": "success",
-    "token": "asdf98rq-we0ruweqjfi"
-}```
-
-
-Response Body (Failed) :
-```json {
-    "errors": "Invalid username or password"
-}```
+#### Response Body (Failed) :
+```json 
+{
+    "msg": "Invalid username or password"
+}
+```
 
 
