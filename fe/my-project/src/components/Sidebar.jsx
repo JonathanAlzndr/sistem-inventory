@@ -1,0 +1,118 @@
+import React from "react";
+// NavLink untuk navigasi, useNavigate untuk aksi logout
+import { NavLink, useNavigate } from "react-router-dom";
+import { FaFileAlt } from "react-icons/fa";
+import { MdDashboard } from "react-icons/md";
+import { MdOutlineWarehouse } from "react-icons/md";
+import { BiSolidLogOut } from "react-icons/bi";
+import { FaBoxOpen, FaCashRegister } from "react-icons/fa";
+
+// ======================================================
+// PUSAT KONTROL NAVIGASI (PETA NAVIGASI)
+// ======================================================
+
+const ALL_NAV_LINKS = {
+  // --- INI BAGIAN YANG DIPERBAIKI ---
+  // Dasbor sekarang adalah objek statis, sama seperti laporan
+  dasbor: {
+    name: "Dasbor",
+    path: "/dasbor", // <-- Path-nya sekarang statis
+    icon: <MdDashboard />,
+    end: true, // 'end: true' penting untuk 'Dasbor'
+  },
+  // --- AKHIR BAGIAN YANG DIPERBAIKI ---
+
+  laporan: {
+    name: "Laporan",
+    path: "/laporan",
+    icon: <FaFileAlt />,
+    end: false,
+  },
+  produk: {
+    name: "Produk",
+    path: "/produk",
+    icon: <FaBoxOpen />,
+    end: false,
+  },
+  transaksi: {
+    name: "Transaksi",
+    path: "/transaksi",
+    icon: <FaCashRegister />,
+    end: false,
+  },
+};
+
+// Peta Izin (Ini sudah benar)
+// Peta ini hanya memilih link mana yang mau ditampilkan
+const ROLE_NAV_MAP = {
+  pemilik: [ALL_NAV_LINKS.dasbor, ALL_NAV_LINKS.laporan],
+  "admin-gudang": [ALL_NAV_LINKS.dasbor, ALL_NAV_LINKS.produk],
+  kasir: [ALL_NAV_LINKS.dasbor, ALL_NAV_LINKS.transaksi],
+  default: [ALL_NAV_LINKS.dasbor],
+};
+
+export default function Sidebar() {
+  const navigate = useNavigate();
+  const role = localStorage.getItem("role");
+
+  // --- LOGIKA DINAMIS SEKARANG LEBIH SEDERHANA ---
+  // Tidak perlu '.map()' dengan cek 'typeof' lagi
+  const navItemsToShow = ROLE_NAV_MAP[role] || ROLE_NAV_MAP.default;
+  // --- AKHIR LOGIKA DINAMIS ---
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/RoleLogin");
+  };
+
+  const getNavLinkClass = ({ isActive }) => {
+    return `flex items-center gap-3 px-6 py-3 hover:bg-gray-100 ${
+      isActive ? "bg-green-500 text-white" : "" // Style Anda untuk link aktif
+    }`;
+  };
+
+  return (
+    // Desain Anda tidak diubah
+    <div className="w-[200px] bg-white text-black h-screen flex flex-col">
+      {/* Logo / title (Desain Anda) */}
+      <div className="h-20 flex gap-3   items-center justify-center text-2xl font-bold border-b  border-gray-300">
+        <div className="bg-[#29DB6A] rounded-[10px] p-1 ">
+          <MdOutlineWarehouse className="text-4xl text-white" />
+        </div>
+        <div>
+          <h1 className="text-[22px] font-bold text-gray-800 leading-none ">
+            CR.JAYA
+          </h1>
+          <p className="text-[11px]   text-gray-500">Sistem Inventaris</p>
+        </div>
+      </div>
+
+      {/* Menu (Desain Anda, logikanya sederhana) */}
+      <nav className="flex-1 mt-4 text-[#3E3A3A] font-semibold ">
+        {/* Mapping dari navItemsToShow (dinamis) */}
+        {navItemsToShow.map((item) => (
+          <NavLink
+            key={item.name}
+            to={item.path}
+            end={item.end}
+            className={getNavLinkClass}
+          >
+            {item.icon}
+            <span>{item.name}</span>
+          </NavLink>
+        ))}
+
+        {/* "Keluar" sebagai <button> */}
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-6 py-3 hover:bg-gray-100 w-full text-left"
+        >
+          <BiSolidLogOut />
+          <span>Keluar</span>
+        </button>
+      </nav>
+    </div>
+  );
+}
+

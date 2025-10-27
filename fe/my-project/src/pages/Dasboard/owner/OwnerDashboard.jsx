@@ -1,11 +1,9 @@
 export default function OwnerDashboard() {
   return (
-    <div className="p-6">
-   
-   <div className="flex">
-    <section>dc</section>
-    <nav>d</nav>
-   </div>
+    <div className="flex flex-1">
+      <nav className="w-full h-[82px] bg-amber-300"
+      >test</nav>
+      <div className="h-full ">test</div>
     </div>
   );
 }

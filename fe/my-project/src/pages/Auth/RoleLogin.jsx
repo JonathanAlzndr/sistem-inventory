@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import gambar from "../../assets/gambar/dasbor.png";
 import { FaArrowRightLong } from "react-icons/fa6";
-import Login from "./Login";
+
 
 
 
@@ -16,7 +16,7 @@ const [role, setRole] = useState("");
   const HandleNext = () => {
     if (!role) return alert("Pilih role dulu!");
     sessionStorage.setItem("role", role);
-    navigate('./Login'); // pindah ke halaman login
+    navigate('/Login'); // pindah ke halaman login
   };
 
   return (
@@ -32,6 +32,7 @@ const [role, setRole] = useState("");
                 onChange={(e) => setRole(e.target.value)}
                 className=" px-4 py-2 border border-[#CFCECE]  bg-[#ECEAEA] rounded-[10px] focus:outline-none focus:ring focus:ring-blue-400"
               >
+                 <option value="">-Pilih role-</option>
                 <option value="pemilik">Pemilik</option>
                 <option value="kasir">Kasir</option>
                 <option value="admin-gudang">Admin Gudang</option>
@@ -40,7 +41,7 @@ const [role, setRole] = useState("");
 
             <button
                onClick={HandleNext}
-              type="submit"
+              type="button"
               className="flex justify-center items-center gap-3 w-[117px] bg-[#22BE5B] text-white py-2 rounded-[10px] hover:bg-blue-700 transition"
             >
               Login
