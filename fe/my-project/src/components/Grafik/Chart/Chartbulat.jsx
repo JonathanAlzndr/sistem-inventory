@@ -1,25 +1,25 @@
 import React from "react";
 import Chart from "react-apexcharts";
-
-export default function DistribusiStokChart() {
+export default function ChartBulat() {
   const chartData = {
-    series: [45, 30, 15, 10],
+    series: [ 30, 15, 10],
     options: {
       chart: {
         type: "donut",
         height: 350,
       },
       title: {
-        text: "Distribusi Stok Beras per Jenis",
+      
         align: "center",
         style: {
+          fontFamily:"poppines",
           fontSize: "16px",
           color: "#111111",
           fontWeight: 600,
         },
       },
-      labels: ["Beras Premium", "Beras Medium", "Beras Merah", "Beras Hitam"],
-      colors: ["#22c55e", "#60a5fa", "#facc15", "#ef4444"], // hijau, biru, kuning, merah
+      labels: ["Dua Merpati", "Membramo - Tolai", "Superwing - Kotamobago"],
+      colors: ["#22c55e", "#60a5fa", "#facc15", ], // hijau, biru, kuning, merah
       legend: {
         position: "bottom",
         labels: {
@@ -28,7 +28,7 @@ export default function DistribusiStokChart() {
       },
       dataLabels: {
         style: {
-          colors: ["#000000"],
+          colors: ["#fff"],
         },
       },
       plotOptions: {
@@ -51,7 +51,7 @@ export default function DistribusiStokChart() {
   };
 
   return (
-    <div className="bg-white shadow-md rounded-2xl p-6 w-full max-w-[600px] mx-auto">
+    <div className="">
       <Chart
         options={chartData.options}
         series={chartData.series}

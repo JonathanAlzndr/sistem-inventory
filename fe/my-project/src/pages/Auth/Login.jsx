@@ -34,9 +34,9 @@ export default function Login() {
       localStorage.setItem("role", role);
 
       // redirect sesuai role
-      if (role === "kasir") navigate("/Kasir");
-      else if (role === "pemilik") navigate("/Owner");
-      else if (role === "admin-gudang") navigate("/Gudang");
+      if (role === "kasir") navigate("/dasbor");
+      else if (role === "pemilik") navigate("/dasbor");
+      else if (role === "admin-gudang") navigate("/dasbor");
     } else {
       alert("Username atau password salah!");
     }

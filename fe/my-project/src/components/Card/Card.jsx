@@ -6,7 +6,7 @@ import { BsExclamationLg } from "react-icons/bs";
 
 const dataDummy = [
   {
-    title: "Total Stock Beras",
+    title: "Total Stok Beras",
     Value: 43,
     colorbg:" bg-[#1F91F5]/10",
     bgicon:"bg-[#1F91F5]",
@@ -14,7 +14,7 @@ const dataDummy = [
 
   },
   {
-    title: "Total Stock Masuk",
+    title: "Total Stok Masuk",
     Value: 43,
     colorbg:" bg-[#36DC72]/10",
     bgicon:"bg-[#29DB6A]",
@@ -22,7 +22,7 @@ const dataDummy = [
 
   },
   {
-    title: "Total Stock Keluar",
+    title: "Total Stok Keluar",
     Value: 43,
     colorbg:" bg-[#FE4524]/10",
     bgicon:"bg-[#FE4524]",
@@ -30,7 +30,7 @@ const dataDummy = [
 
   },
   {
-    title: "Total Stock Kritis",
+    title: "Total Stok Kritis",
     Value: 43,
     colorbg:" bg-[#F9315A]/10",
     bgicon:"bg-[#F9315A]",
@@ -41,11 +41,11 @@ const dataDummy = [
 
 const Card = () => {
   return (
-    <div className="flex justify-center space-x-14">
+    <div className="flex  justify-center space-x-14">
       {dataDummy.map((item, index) => (
         <div
           key={index}
-          className={` shadow-[0_5px_8px_rgba(0,0,0,0.25)]  ${item.colorbg} rounded-[10px] w-[249px] h-[108px] mt-10 flex justify-center items-center gap-4`}
+          className={`hover:scale-103 duration-300 shadow-[0_5px_8px_rgba(0,0,0,0.25)]  ${item.colorbg} rounded-[10px] w-[249px] h-[108px] mt-10 flex justify-center items-center gap-4`}
         >
           <div>
             <p>{item.title}</p>
