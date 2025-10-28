@@ -9,7 +9,7 @@ export default function DashboardLayout() {
       <Sidebar />
       <div className="flex-1 flex flex-col">
         <Navbar title="Dasbor" subtitle="Sistem Inventaris Gudang" />
-        <main className="p-6 flex-1 bg-[#F4F2F2] overflow-auto">
+        <main className="px-10 py-6 flex-1 bg-[#F4F2F2] overflow-auto">
           <Outlet />
         </main>
       </div>

@@ -5,7 +5,7 @@ import "./App.css";
 // --- PERBAIKAN DI SINI ---
 // 1. Typo: Nama file komponen biasanya PascalCase (KasirDashboard.jsx)
 // 2. Typo: Nama file 'kasir' diubah ke 'KasirDashboard' (asumsi)
-import KasirDashboard from "./pages/Dasboard/kasir/KasirDashboard"; 
+import KasirDashboard from "./pages/Dasboard/kasir/Kasir"; 
 import GudangDashboard from "./pages/Dasboard/gudang/GudangDashboard";
 // 3. Typo: Tanda slash ganda '//' dihapus
 import OwnerDashboard from "./pages/Dasboard/owner/OwnerDashboard"; 
@@ -14,7 +14,7 @@ import LayoutDashborad from "./components/layout/DashboardLayout";
 
 // --- DILENGKAPI ---
 // 4. Impor halaman lain yang ada di sidebar
-import Laporan from "./pages/Dasboard/Fitur/Laporan";
+import Laporan from "./pages/Dasboard/Fitur/Produk";
 import Produk from "./pages/Dasboard/Fitur/Produk";
 import Transaksi from "./pages/Dasboard/Fitur/Transaksi";
 import Dasbor from "./pages/Dasboard/Fitur/Dasbor";
