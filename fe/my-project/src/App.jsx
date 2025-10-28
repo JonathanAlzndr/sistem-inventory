@@ -14,7 +14,7 @@ import LayoutDashborad from "./components/layout/DashboardLayout";
 
 // --- DILENGKAPI ---
 // 4. Impor halaman lain yang ada di sidebar
-import Laporan from "./pages/Dasboard/Fitur/Produk";
+import Laporan from "./pages/Dasboard/Fitur/Laporan";
 import Produk from "./pages/Dasboard/Fitur/Produk";
 import Transaksi from "./pages/Dasboard/Fitur/Transaksi";
 import Dasbor from "./pages/Dasboard/Fitur/Dasbor";

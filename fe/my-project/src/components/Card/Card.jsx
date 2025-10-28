@@ -41,7 +41,7 @@ const dataDummy = [
 
 const Card = () => {
   return (
-    <div className="flex  justify-center space-x-14">
+    <div className="flex  w-full justify-center space-x-13">
       {dataDummy.map((item, index) => (
         <div
           key={index}

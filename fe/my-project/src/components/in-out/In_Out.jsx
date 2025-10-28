@@ -10,7 +10,7 @@ const DataTransaksi = [
 
 export default function In_Out() {
   return (
-    <div className="w-[720px] bg-white rounded-2xl shadow-md p-6 mt-6">
+    <div className="w-[720px] bg-white rounded-2xl shadow-md p-5">
       <h2 className="text-lg  mb-1 flex items-center gap-2">
 <FaHistory className="text-red-600" /> Riwayat Beras Masuk & Keluar
       </h2>
