@@ -1,0 +1,3 @@
+cd "sistem-inventory"
+cd "fe"
+cd "my-project"
