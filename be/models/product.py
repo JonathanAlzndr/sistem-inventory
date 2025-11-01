@@ -14,7 +14,6 @@ class Product(db.Model):
     purchasePrice = db.Column(db.Numeric(10, 2), nullable=False)
     productImg = db.Column(db.String(255), nullable=True)
 
-    # Relasi diperbarui: menunjuk ke 'OrderDetail'
     order_details = db.relationship("OrderDetail", back_populates="product")
 
     def __repr__(self):

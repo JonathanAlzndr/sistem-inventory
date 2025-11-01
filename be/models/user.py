@@ -9,7 +9,6 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50), nullable=False)
 
-    # Relasi diperbarui: menunjuk ke 'Sale' dan 'back_populates'
     sales = db.relationship("Sale", back_populates="user")
 
     def __repr__(self):
