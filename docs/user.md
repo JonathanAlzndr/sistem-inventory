@@ -22,7 +22,8 @@ All Users
 ```json
 {
     "msg": "success",
-    "token": "jwt"
+    "token": "jwt",
+    "user_role": "Role"
 }
 ```
 
