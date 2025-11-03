@@ -7,6 +7,7 @@ from utils.extensions import db
 from models.user import User
 from models.product import Product
 from routes.auth.auth_routes import auth_bp
+from routes.products.product_routes import product_bp
 from utils.extensions import bcrypt, jwt, migrate
 
 def create_app():
@@ -19,6 +20,7 @@ def create_app():
     migrate.init_app(app, db)
 
     app.register_blueprint(auth_bp)
+    app.register_blueprint(product_bp)
 
     with app.app_context():
         db.create_all()
