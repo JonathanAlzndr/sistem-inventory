@@ -1,14 +1,13 @@
+import os 
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from config import Config
-from utils.extensions import db
+from utils.extensions import db, bcrypt, jwt, migrate
 from models.user import User
 from models.product import Product
+from models.order_detail import OrderDetail
+from models.sale import Sale
 from routes.auth.auth_routes import auth_bp
 from routes.products.product_routes import product_bp
-from utils.extensions import bcrypt, jwt, migrate
 
 def create_app():
     app = Flask(__name__)
@@ -22,8 +21,8 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(product_bp)
 
-    with app.app_context():
-        db.create_all()
+    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
     return app
 
