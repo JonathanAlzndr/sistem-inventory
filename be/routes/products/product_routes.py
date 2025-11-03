@@ -17,12 +17,16 @@ def get_all_products():
 
     result = [
         {
-            "id": p.id,
-            "name": p.name,
-            "description": p.description,
-            "quantity": p.quantity
+            "productId": p.productId,
+            "productName": p.productName,
+            "receivedDate": p.receivedDate,
+            "weight": p.weight,
+            "currentStock": p.currentStock,
+            "status": p.status,
+            "price": p.price,
+            "imgPath": p.productImg
         }
         for p in products
     ]
 
-    return jsonify(result), 200
+    return jsonify({"msg": "Success", "productList": result}), 200
