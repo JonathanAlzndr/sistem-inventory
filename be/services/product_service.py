@@ -9,7 +9,9 @@ from config import Config
 
 from repositories.product_repository import (
     get_all_product as repo_get_all_product,
-    create_new_product as repo_create_product
+    create_new_product as repo_create_product,
+    get_product_by_id as repo_get_product_by_id,
+    delete_product as repo_delete_product
 )
 
 def get_all_product_service(limit: int=10, offset: int=0, weight: int = 5):
@@ -50,7 +52,6 @@ def create_product_service(form_data, file):
     except Exception as e:
         raise FileSaveError(msg=str(e))
     
-
     try:
         product_data = {
             "productName": product_name,
@@ -70,5 +71,11 @@ def create_product_service(form_data, file):
         if os.path.exists(save_path):
             os.remove(save_path)
         raise e
+
+def get_product_by_id_service(productId):
+    return repo_get_product_by_id(productId)
+
+def delete_product_service(productId):
+    return repo_delete_product(productId)
 
 

@@ -24,3 +24,17 @@ def create_new_product(data):
     except Exception as e:
         db.session.rollback() 
         raise e
+    
+def get_product_by_id(productId):
+    return Product.query.get(productId)
+
+def delete_product(productId):
+    product = Product.query.get(productId)
+
+    if not product:
+        return False
+    
+    db.session.delete(product)
+    db.session.commit()
+
+    return True

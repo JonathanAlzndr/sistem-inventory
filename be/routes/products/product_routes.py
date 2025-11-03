@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
-from services.product_service import get_all_product_service, create_product_service
+from services.product_service import get_all_product_service, create_product_service, get_product_by_id_service, delete_product_service
 from utils.decorators import roles_required
 from utils import file_extensions
 
@@ -56,4 +56,40 @@ def create_product():
     return jsonify(
         msg="Success to create new product"
     ), 201
+
+@product_bp.route('/<int:productId>', methods=['GET'])
+@jwt_required()
+@roles_required('Staff')
+def get_product_by_id(productId):
+    product = get_product_by_id_service(productId)
+    
+    if product:
+        return jsonify({
+            "msg": "Success",
+            "product": {
+                "productId": product.productId,
+                "productName": product.productName,
+                "receivedDate": product.receivedDate,
+                "weight": product.weight,
+                "currentStock": product.currentStock,
+                "status": product.status,
+                "sellPrice": product.sellPrice,
+                "purchasePrice": product.purchasePrice,
+                "productImg": product.productImg
+            }
+        }), 200
+    else:
+        return jsonify({"msg": "Product not found"}), 404
+
+@product_bp.route('/<int:productId>', methods=['DELETE'])
+@jwt_required()
+@roles_required('Staff')
+def delete_product(productId):
+    result = delete_product_service(productId)
+
+    if result == True:
+        return jsonify({"msg": "Success to delete product"}), 200
+    else:
+        return jsonify({"msg": "Failed to delete product"}), 404
+
 
