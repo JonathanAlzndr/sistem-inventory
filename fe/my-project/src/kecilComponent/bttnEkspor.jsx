@@ -1,0 +1,12 @@
+import React from 'react'
+import { BiSolidFileExport } from "react-icons/bi";
+const bttnEkspor = () => {
+  return (
+    <button className=" hover:scale-102 duration-95 p-1 border  rounded-[10px] bg-sky-700 border-gray-300 text-white text-[13px] w-[130px] gap-2 flex items-center justify-center ">
+                Ekspor Data
+                <BiSolidFileExport className="text-lg"/>
+                </button>
+  )
+}
+
+export default bttnEkspor

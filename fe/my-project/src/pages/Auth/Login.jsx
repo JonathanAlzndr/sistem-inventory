@@ -1,61 +1,110 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import gambar from "../../assets/gambar/dasbor.png";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaArrowRightLong } from "react-icons/fa6";
 
 export default function Login() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-
+  
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    //  role berdasarkan email
-    if (formData.email === "admin@mail.com") {
-      navigate("/dashboard/admin");
-    } else if (formData.email === "kasir@mail.com") {
-      navigate("/dashboard/kasir");
-    } else if (formData.email === "gudang@mail.com") {
-      navigate("/dashboard/gudang");
-    } else if (formData.email === "owner@mail.com") {
-      navigate("/dashboard/owner");
-    } else {
-      alert("Email tidak dikenali! Coba pakai admin@mail.com, kasir@mail.com, gudang@mail.com, atau owner@mail.com");
+    try {
+      const res = await fetch("http://127.0.0.1:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      
+      if (!res.ok) return alert("Login gagal!");
+
+      const data = await res.json();
+      alert("login berhasil");
+
+      const role = sessionStorage.getItem("role");
+      sessionStorage.setItem("token", data.token);
+
+      // redirect sesuai role
+      if (role === "kasir") navigate("/dasbor");
+      else if (role === "pemilik") navigate("/dasbor");
+      else if (role === "gudang") navigate("/dasbor");
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan server!");
     }
   };
 
   return (
-    <div className="flex   items-center   justify-center min-h-screen bg-gray-100 p-23 ">
-      <div className="w-full max-w-md flex justify-center  bg-white shadow-lg rounded-lg p-">
-        <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-400"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-400"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+    <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="w-[900px] h-[500px] flex shadow-lg rounded-[10px]">
+        <div className="w-[450px] h-full p-10 py-23">
+          <h2 className="text-2xl font-bold text-center mb-6">Masuk</h2>
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-8 flex flex-col px-6"
           >
-            Login
-          </button>
-        </form>
+            <div className="flex-col flex">
+              <label htmlFor="username" className="text-black/54">
+                Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                name="username"
+                className="px-4 py-2 border border-[#CFCECE] bg-[#ECEAEA] rounded-[10px] focus:outline-none focus:ring focus:ring-blue-400"
+                value={formData.username}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            {/* input password + icon mata */}
+            <div className="flex-col flex relative">
+              <label htmlFor="password" className="text-black/54">
+                Password
+              </label>
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                className="px-4 py-2 border border-[#CFCECE] bg-[#ECEAEA] rounded-[10px] focus:outline-none focus:ring focus:ring-blue-400 pr-10"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-9 text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              className="flex justify-center items-center gap-3 w-[117px] bg-[#22BE5B] text-white py-2 rounded-[10px] hover:bg-blue-700 transition"
+            >
+              Masuk
+              <FaArrowRightLong />
+            </button>
+          </form>
+        </div>
+
+        <div className="text-white text-center bg-linear-to-b from-[#16A34A] to-[#31E272] h-full w-[450px] rounded-bl-[20px] rounded-tl-[20px] rounded-[10px]">
+          <div className="flex flex-col justify-center items-center py-23">
+            <h2 className="text-[24px] font-bold">Sistem Pencatatan Beras</h2>
+            <h1 className="text-[30px] font-semibold">CR.JAYA</h1>
+            <img src={gambar} alt="Dashboard" />
+          </div>
+        </div>
       </div>
     </div>
   );
