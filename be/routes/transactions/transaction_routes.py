@@ -5,7 +5,7 @@ from flask import Blueprint, request, jsonify, url_for
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from decimal import Decimal
 from datetime import datetime
-from services.transaction_service import create_new_transaction_service, get_all_transactions_service, get_transaction_detail_service
+from services.transaction_service import create_new_transaction_service, get_all_transactions_service, get_transaction_detail_service, delete_transaction_service
 
 transaction_bp = Blueprint('transaction', __name__, url_prefix='/api/transaction')
 
@@ -66,6 +66,20 @@ def get_transaction_detail(transactionId):
     try:
         receipt = get_transaction_detail_service(transactionId)
         return jsonify(receipt), 200
+
+    except TransactionNotFound as e:
+        return jsonify(msg=str(e)), 404
+    except Exception as e:
+        return jsonify(msg=f"Internal server error: {str(e)}"), 500
+    
+@transaction_bp.route('/<int:transactionId>', methods=['DELETE'])
+@jwt_required()
+@roles_required("Cashier")
+def delete_transaction(transactionId):
+
+    try:
+        delete_transaction_service(transactionId)
+        return jsonify(msg="Success to delete transaction"), 200
 
     except TransactionNotFound as e:
         return jsonify(msg=str(e)), 404

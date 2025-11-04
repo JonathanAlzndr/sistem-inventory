@@ -25,4 +25,3 @@ def get_transaction_detail_by_id(sale_id: int):
         ) \
         .filter(Sale.saleId == sale_id) \
         .first()
-

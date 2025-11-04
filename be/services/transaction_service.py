@@ -118,3 +118,22 @@ def get_transaction_detail_service(sale_id: int):
     }
     
     return receipt
+
+def delete_transaction_service(sale_id: int):
+    sale_to_delete = get_transaction_detail_by_id(sale_id)
+
+    if not sale_to_delete:
+        raise TransactionNotFound(msg="Transaction not found, cannot delete")
+
+    try:
+        for detail in sale_to_delete.order_details:
+            product = detail.product 
+            if product:
+                product.currentStock += detail.quantity
+                db.session.add(product) 
+        db.session.delete(sale_to_delete)
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+        raise e
