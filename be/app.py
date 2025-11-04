@@ -1,5 +1,5 @@
 import os 
-from flask import Flask
+from flask import Flask, send_from_directory, current_app
 from config import Config
 from utils.extensions import db, bcrypt, jwt, migrate
 from models.user import User
@@ -23,6 +23,15 @@ def create_app():
 
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+    @app.route('/uploads/<path:filename>')
+    def serve_upload(filename):
+        upload_dir = current_app.config.get('UPLOAD_FOLDER')
+        
+        if not upload_dir:
+            upload_dir = os.path.join(current_app.root_path, 'uploads')
+            
+        return send_from_directory(upload_dir, filename)
 
     return app
 

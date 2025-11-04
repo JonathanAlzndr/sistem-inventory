@@ -220,10 +220,3 @@ Staff
     "msg": "Failed to create new product"
 }
 ```
-
-
-
-
-
-
-
