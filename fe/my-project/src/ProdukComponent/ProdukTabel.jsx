@@ -1,5 +1,6 @@
 import React from "react";
 import { FaEdit, FaTrash, FaDownload } from "react-icons/fa";
+import BttnEkspor from "../kecilComponent/bttnEkspor";
 
 const dummyProduk = [
   {
@@ -87,12 +88,9 @@ export default function ProdukTabel() {
         <h2 className="text-lg font-semibold text-gray-700">
           Daftar Produk
         </h2>
-        <button
-          onClick={handleExport}
-          className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-        >
-          <FaDownload /> Ekspor Data
-        </button>
+        <BttnEkspor
+        onClick={handleExport}/>
+ 
       </div>
 
       {/* Tabel produk */}
