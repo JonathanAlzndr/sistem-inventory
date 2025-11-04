@@ -9,3 +9,6 @@ def create_user(username, password_hash, role):
     db.session.add(user)
     db.session.commit()
     return user
+
+def get_user_by_id(userId):
+    return User.query.get(userId)
