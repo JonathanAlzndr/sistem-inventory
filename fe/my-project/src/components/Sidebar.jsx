@@ -66,7 +66,7 @@ export default function Sidebar() {
 
   const getNavLinkClass = ({ isActive }) => {
     return `flex items-center gap-3 px-6 py-3 hover:bg-gray-100 ${
-      isActive ? "bg-green-500 text-white" : "" // Style Anda untuk link aktif
+      isActive ? "bg-green-500 text-white" : "" // 
     }`;
   };
 
