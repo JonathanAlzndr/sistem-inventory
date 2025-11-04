@@ -17,8 +17,8 @@ All Users
 
 | Parameter   | Type     | Description                                      |
 |--------------|----------|--------------------------------------------------|
-| `page`       | `int`    | Page number for pagination (default: `1`).      |
-| `size`       | `int`    | Number of products per page (default: `10`).    |
+| `limit`       | `int`    | Page number for pagination (default: `10`).      |
+| `offset`       | `int`    | Number of products per page (default: `0`).    |
 | `weight`   | `int` | Filter products by weight.               |
 
 ### Response Body (Success):
@@ -33,7 +33,8 @@ All Users
             "weight": 20,
             "currentStock": 112,
             "status": "Aman",
-            "price": "15000.00"
+            "price": "15000.00",
+            "imgPath": "image.jpg"
         },
         {
             "productId": "10",
@@ -42,7 +43,8 @@ All Users
             "weight": 20,
             "currentStock": 112,
             "status": "Aman",
-            "price": "15500.00"
+            "price": "15500.00",
+            "imgPath": "image.jpg"
         },
     ],
 }
@@ -88,7 +90,8 @@ Staff
         "weight": 20,
         "currentStock": 112,
         "status": "Aman",
-        "price": "15500.00"
+        "price": "15500.00",
+        "imgPath": "image.jpg"
     }
 }
 ```
@@ -200,6 +203,7 @@ Staff
     "currentStock": 13,
     "sellPrice": "15000.00",
     "purchasePrice": "10000.00",
+    "imgPath": "image.jpg"
 }
 ```
 
