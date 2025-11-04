@@ -17,6 +17,7 @@ def get_all_products():
 
     result = [
         {
+
             "id": p.id,
             "name": p.name,
             "description": p.description,
