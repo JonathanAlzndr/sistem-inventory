@@ -1,12 +1,13 @@
-from datetime import datetime, timezone # <--- PERBAIKAN 1
+from datetime import datetime, timezone
 from decimal import Decimal
-from utils.exceptions import ValidationError, InsufficientStockError
+from utils.exceptions import ValidationError, InsufficientStockError, TransactionNotFound
 from utils.extensions import db
 from repositories.auth_repository import get_user_by_id
 from repositories.product_repository import get_product_by_id
+from repositories.sale_repository import get_all_transaction, get_transaction_detail_by_id
 from models import Sale, OrderDetail
 
-def create_new_transaction(items_list, cashier_id):
+def create_new_transaction_service(items_list, cashier_id):
     cashier = get_user_by_id(cashier_id)
     
     if not cashier:
@@ -88,3 +89,32 @@ def create_new_transaction(items_list, cashier_id):
     except Exception as e:
         db.session.rollback()
         raise e
+    
+def get_all_transactions_service(limit: int=10, offset: int=0):
+    return get_all_transaction(limit, offset)
+
+def get_transaction_detail_service(sale_id: int):
+    
+    sale = get_transaction_detail_by_id(sale_id)
+    
+    if not sale:
+        raise TransactionNotFound(msg="Transaction not found")
+    
+    items_list = []
+    for detail in sale.order_details:
+        items_list.append({
+            "productName": detail.product.productName,
+            "sellPrice": str(detail.product.sellPrice), 
+            "quantity": detail.quantity,
+            "subtotal": str(detail.subTotal) 
+        })
+
+    receipt = {
+        "transactionId": sale.saleId,
+        "transactionDate": sale.saleDate.isoformat(),
+        "cashier": sale.user.username,
+        "items": items_list,
+        "totalPrice": str(sale.totalPrice)
+    }
+    
+    return receipt
