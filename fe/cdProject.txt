@@ -5,3 +5,5 @@ cd "my-project"
 
 be:
 python -m venv venv
+venv\Scripts\activate
+ap

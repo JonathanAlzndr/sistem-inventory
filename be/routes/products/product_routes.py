@@ -1,21 +1,32 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, url_for
 from flask_jwt_extended import jwt_required
-from services.product_service import get_all_product_service, create_product_service, get_product_by_id_service, delete_product_service
+from services.product_service import (
+    get_all_product_service, 
+    create_product_service, 
+    get_product_by_id_service, 
+    delete_product_service, 
+    update_product_service
+)
 from utils.decorators import roles_required
+from utils.exceptions import ProductNotFound, ValidationError
 from utils import file_extensions
 
 product_bp = Blueprint('product', __name__, url_prefix='/api/products')
 
+def get_image_url(filename):
+    if not filename:
+        return None
+    return url_for('serve_upload', filename=filename, _external=True)
+
 @product_bp.route('/', methods=['GET'])
 @jwt_required()
 def get_all_products():
-
     limit = request.args.get('limit', 10, type=int)
     offset = request.args.get('offset', 0, type=int)
     weight = request.args.get('weight', 5, type=int)
 
     products = get_all_product_service(limit, offset, weight)
-
+    
     result = [
         {
 
@@ -26,8 +37,7 @@ def get_all_products():
             "currentStock": p.currentStock,
             "status": p.status,
             "sellPrice": p.sellPrice,
-            "imgPath": p.productImg
-
+           
         }
         for p in products
     ]
@@ -39,25 +49,31 @@ def get_all_products():
 @jwt_required()
 @roles_required("Cashier")
 def create_product():
-
     if 'imgPath' not in request.files:
         return jsonify(msg='Image file is not found'), 400
     
     file = request.files['imgPath']
 
     if file.filename == '':
-        return jsonify(msg='No file attached')
+        return jsonify(msg='No file attached'), 400
 
     if not file or not file_extensions.allowed_file(file.filename):
         return jsonify(msg='File type not allowed'), 400
     
     form_data = request.form
 
-    create_product_service(form_data=form_data, file=file)
-
-    return jsonify(
-        msg="Success to create new product"
-    ), 201
+    try:
+        new_product = create_product_service(form_data=form_data, file=file)
+        return jsonify(
+            msg="Success to create new product",
+            product={
+                "productId": new_product.productId,
+                "productName": new_product.productName,
+                "imgPath": get_image_url(new_product.productImg)
+            }
+        ), 201
+    except (ValidationError, Exception) as e:
+        return jsonify(msg=f"Failed to create product: {str(e)}"), 400
 
 @product_bp.route('/<int:productId>', methods=['GET'])
 @jwt_required()
@@ -77,7 +93,7 @@ def get_product_by_id(productId):
                 "status": product.status,
                 "sellPrice": product.sellPrice,
                 "purchasePrice": product.purchasePrice,
-                "productImg": product.productImg
+                "productImg": get_image_url(product.productImg)
             }
         }), 200
     else:
@@ -87,11 +103,38 @@ def get_product_by_id(productId):
 @jwt_required()
 @roles_required('Staff')
 def delete_product(productId):
-    result = delete_product_service(productId)
-
-    if result == True:
+    try:
+        delete_product_service(productId)
         return jsonify({"msg": "Success to delete product"}), 200
-    else:
-        return jsonify({"msg": "Failed to delete product"}), 404
+    except ProductNotFound as e:
+        return jsonify({"msg": str(e)}), 404
+    except Exception as e:
+        return jsonify({"msg": f"Failed to delete product: {str(e)}"}), 500
 
+@product_bp.route('/<int:productId>', methods=['PATCH'])
+@jwt_required()
+@roles_required("Staff")
+def update_product(productId):
+    data = request.get_json()
+    if not data:
+        return jsonify(msg="No data provided to update"), 400
 
+    try:
+        updated_product = update_product_service(productId, data)
+        return jsonify(
+            msg="Success to update product",
+            product={
+                "productId": updated_product.productId,
+                "productName": updated_product.productName,
+                "currentStock": updated_product.currentStock,
+                "sellPrice": updated_product.sellPrice,
+                "imgPath": get_image_url(updated_product.productImg)
+            }
+        ), 200
+
+    except ProductNotFound as e:
+        return jsonify(msg=str(e)), 404
+    except ValidationError as e:
+        return jsonify(msg=str(e)), 400
+    except Exception as e:
+        return jsonify(msg=f"Internal server error: {str(e)}"), 500

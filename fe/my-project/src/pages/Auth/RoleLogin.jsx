@@ -29,9 +29,9 @@ const RoleLogin = () => {
                 className=" px-4 py-2 border border-[#CFCECE]  bg-[#ECEAEA] rounded-[10px] focus:outline-none focus:ring focus:ring-blue-400"
               >
                 <option value="">-Pilih role-</option>
-                <option value="pemilik">Pemilik</option>
-                <option value="kasir">Kasir</option>
-                <option value="admin-gudang">Admin Gudang</option>
+                <option value="Owner">Pemilik</option>
+                <option value="Cashier">Kasir</option>
+                <option value="Staff">Admin Gudang</option>
               </select>
             </div>
 

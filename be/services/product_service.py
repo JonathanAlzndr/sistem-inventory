@@ -1,8 +1,9 @@
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
-from utils.exceptions import ValidationError, FileSaveError
+from utils.exceptions import ValidationError, FileSaveError, ProductNotFound
 from werkzeug.utils import secure_filename
 import os
+from utils.extensions import db
 import uuid
 from config import Config
 
@@ -78,4 +79,54 @@ def get_product_by_id_service(productId):
 def delete_product_service(productId):
     return repo_delete_product(productId)
 
+def update_product_service(product_id, update_data):
+    product = repo_get_product_by_id(product_id)
 
+    if not product:
+        raise ProductNotFound(msg="Product not found") 
+    try:
+        if "productName" in update_data:
+            product.productName = str(update_data["productName"])
+            
+        if "receivedDate" in update_data:
+            product.receivedDate = datetime.fromisoformat(
+                update_data["receivedDate"].replace('Z', '+00:00')
+            )
+            
+        if "weight" in update_data:
+            weight = int(update_data["weight"])
+            if weight <= 0:
+                raise ValueError("Weight must be a positive number")
+            product.weight = weight
+            
+        if "currentStock" in update_data:
+            stock = int(update_data["currentStock"])
+            if stock < 0:
+                raise ValueError("Stock cannot be negative")
+            product.currentStock = stock
+
+        if "status" in update_data:
+            product.status = str(update_data["status"])
+            
+        if "sellPrice" in update_data:
+            price = Decimal(update_data["sellPrice"])
+            if price < 0:
+                raise ValueError("Selling price cannot be negative")
+            product.sellPrice = price
+            
+        if "purchasePrice" in update_data:
+            price = Decimal(update_data["purchasePrice"])
+            if price < 0:
+                raise ValueError("Purchase price cannot be negative")
+            product.purchasePrice = price
+
+        db.session.commit()
+        
+        return product 
+
+    except (ValueError, TypeError, InvalidOperation) as e:
+        db.session.rollback()
+        raise ValidationError(msg=f"Invalid data type or value: {e}")
+    except Exception as e:
+        db.session.rollback()
+        raise e

@@ -8,7 +8,7 @@ export default function Login() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -22,19 +22,17 @@ export default function Login() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-      
+
       if (!res.ok) return alert("Login gagal!");
 
       const data = await res.json();
       alert("login berhasil");
 
-      const role = sessionStorage.getItem("role");
       sessionStorage.setItem("token", data.token);
 
-      // redirect sesuai role
-      if (role === "kasir") navigate("/dasbor");
-      else if (role === "pemilik") navigate("/dasbor");
-      else if (role === "gudang") navigate("/dasbor");
+      sessionStorage.setItem("role", data.user_role);
+
+      navigate("/dasbor");
     } catch (err) {
       console.error(err);
       alert("Terjadi kesalahan server!");
