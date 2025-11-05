@@ -15,48 +15,51 @@ All Users
 
 ### Query Parameters (Optional)
 
-| Parameter   | Type     | Description                                      |
-|--------------|----------|--------------------------------------------------|
-| `limit`       | `int`    | Page number for pagination (default: `10`).      |
-| `offset`       | `int`    | Number of products per page (default: `0`).    |
-| `weight`   | `int` | Filter products by weight.               |
+| Parameter | Type  | Description                                 |
+| --------- | ----- | ------------------------------------------- |
+| `limit`   | `int` | Page number for pagination (default: `10`). |
+| `offset`  | `int` | Number of products per page (default: `0`). |
+| `weight`  | `int` | Filter products by weight.                  |
 
 ### Response Body (Success):
-```json 
+
+```json
 {
-    "msg": "Success",
-    "productList": [
-        {
-            "productId": "10",
-            "productName": "Beras A",
-            "receivedDate": "2025-10-25T11:15:33Z",
-            "weight": 20,
-            "currentStock": 112,
-            "status": "Aman",
-            "price": "15000.00",
-            "imgPath": "image.jpg"
-        },
-        {
-            "productId": "10",
-            "productName": "Beras A",
-            "receivedDate": "2025-10-25T11:15:33Z",
-            "weight": 20,
-            "currentStock": 112,
-            "status": "Aman",
-            "price": "15500.00",
-            "imgPath": "image.jpg"
-        },
-    ],
+  "msg": "Success",
+  "productList": [
+    {
+      "productId": "10",
+      "productName": "Beras A",
+      "receivedDate": "2025-10-25T11:15:33Z",
+      "weight": 20,
+      "currentStock": 112,
+      "status": "Aman",
+      "price": "15000.00",
+      "imgPath": "image.jpg"
+    },
+    {
+      "productId": "10",
+      "productName": "Beras A",
+      "receivedDate": "2025-10-25T11:15:33Z",
+      "weight": 20,
+      "currentStock": 112,
+      "status": "Aman",
+      "price": "15500.00",
+      "imgPath": "image.jpg"
+    }
+  ]
 }
 ```
 
 ### Response Body (Failed):
-```json 
+
+```json
 {
-    "msg": "Failed",
-    "productList": []
+  "msg": "Failed",
+  "productList": []
 }
 ```
+
 ---
 
 ## Get Product by Id
@@ -73,26 +76,26 @@ Staff
 ### Endpoint : `GET api/products/{productId}`
 
 ### Path Variable
-| Parameter   | Type | Description |
-|--------------|------|-------------|
-| `productId`  | `int` | The ID of the product to fetch |
+
+| Parameter   | Type  | Description                    |
+| ----------- | ----- | ------------------------------ |
+| `productId` | `int` | The ID of the product to fetch |
 
 ### Response Body (Success) :
 
-``` json 
+```json
 {
-    "msg": "Success",
-    "product": 
-    {
-        "productId": "10",
-        "productName": "Beras A",
-        "receivedDate": "2025-10-25T11:15:33Z",
-        "weight": 20,
-        "currentStock": 112,
-        "status": "Aman",
-        "price": "15500.00",
-        "imgPath": "image.jpg"
-    }
+  "msg": "Success",
+  "product": {
+    "productId": "10",
+    "productName": "Beras A",
+    "receivedDate": "2025-10-25T11:15:33Z",
+    "weight": 20,
+    "currentStock": 112,
+    "status": "Aman",
+    "price": "15500.00",
+    "imgPath": "image.jpg"
+  }
 }
 ```
 
@@ -112,22 +115,24 @@ Staff
 ### Endpoint `DELETE api/products/{productId}`
 
 ### Path Variable
-| Parameter   | Type | Description |
-|--------------|------|-------------|
-| `productId`  | `int` | The ID of the product to delete |
 
+| Parameter   | Type  | Description                     |
+| ----------- | ----- | ------------------------------- |
+| `productId` | `int` | The ID of the product to delete |
 
 ### Response body (Success):
-```json 
+
+```json
 {
-    "msg": "Success to delete product"
+  "msg": "Success to delete product"
 }
 ```
 
 ### Response body (Failed)
-```json 
+
+```json
 {
-    "msg": "Failed to delete product"
+  "msg": "Failed to delete product"
 }
 ```
 
@@ -148,34 +153,37 @@ Staff
 
 ### Path Variable
 
-| Parameter | Type   | Required | Description                  |
-|-----------|--------|----------|------------------------------|
-| `productId`  | `Int` | Yes      | The ID of the product to edit |
+| Parameter   | Type  | Required | Description                   |
+| ----------- | ----- | -------- | ----------------------------- |
+| `productId` | `Int` | Yes      | The ID of the product to edit |
 
-#### Request Body (All fields below are optional. Send only the fields you want to update): 
+#### Request Body (All fields below are optional. Send only the fields you want to update):
+
 ```json
 {
-    "productName": "Beras A",
-    "receivedDate": "2025-10-25T11:15:33Z",
-    "weight": 10,
-    "currentStock": 12,
-    "status": "Aman",
-    "sellPrice": "1800.00",
-    "purchasePrice": "14000.00"
+  "productName": "Beras A",
+  "receivedDate": "2025-10-25T11:15:33Z",
+  "weight": 10,
+  "currentStock": 12,
+  "status": "Aman",
+  "sellPrice": "1800.00",
+  "purchasePrice": "14000.00"
 }
 ```
 
 ### Response body (Success):
-``` json
+
+```json
 {
-    "msg": "Success to update product"
+  "msg": "Success to update product"
 }
 ```
 
 ### Response body (Failed)
-``` json
+
+```json
 {
-    "msg": "Product is not found"
+  "msg": "Product is not found"
 }
 ```
 
@@ -194,29 +202,32 @@ Staff
 
 ### Endpoint : `POST api/products`
 
-### Request Body: 
-``` json
+### Request Body:
+
+```json
 {
-    "productName": "beras A",
-    "receivedDate": "2025-10-25T11:15:33Z",
-    "weight": 12,
-    "currentStock": 13,
-    "sellPrice": "15000.00",
-    "purchasePrice": "10000.00",
-    "imgPath": "image.jpg"
+  "productName": "beras A",
+  "receivedDate": "2025-10-25T11:15:33Z",
+  "weight": 12,
+  "currentStock": 13,
+  "sellPrice": "15000.00",
+  "purchasePrice": "10000.00",
+  "imgPath": "image.jpg"
 }
 ```
 
 ### Response body (Success):
+
 ```json
 {
-    "msg": "Success to create new product"
+  "msg": "Success to create new product"
 }
 ```
 
 ### Response body (Failed)
-``` json
+
+```json
 {
-    "msg": "Failed to create new product"
+  "msg": "Failed to create new product"
 }
 ```

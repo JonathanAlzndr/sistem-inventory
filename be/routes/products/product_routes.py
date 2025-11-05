@@ -37,7 +37,9 @@ def get_all_products():
             "currentStock": p.currentStock,
             "status": p.status,
             "sellPrice": p.sellPrice,
-           
+            "purchasePrice":p.purchasePrice,
+            "imgPath": get_image_url(p.productImg)
+
         }
         for p in products
     ]
@@ -47,7 +49,7 @@ def get_all_products():
 
 @product_bp.route('/', methods=['POST'])
 @jwt_required()
-@roles_required("Cashier")
+@roles_required("Staff")
 def create_product():
     if 'imgPath' not in request.files:
         return jsonify(msg='Image file is not found'), 400

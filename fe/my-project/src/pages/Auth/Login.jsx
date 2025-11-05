@@ -28,11 +28,13 @@ export default function Login() {
       const data = await res.json();
       alert("login berhasil");
 
-      sessionStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.token);
 
-      sessionStorage.setItem("role", data.user_role);
+      localStorage.setItem("role", data.user_role);
 
       navigate("/dasbor");
+
+
     } catch (err) {
       console.error(err);
       alert("Terjadi kesalahan server!");
