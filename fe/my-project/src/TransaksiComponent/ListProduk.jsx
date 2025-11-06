@@ -3,7 +3,7 @@ import GambarBeras from "../assets/gambar/beras.jpeg";
 
 const ListProduk = () => {
   // Contoh data dummy (10 item sama semua)
-  const produkList = Array.from({ length: 10 }, (_, i) => ({
+  const produkList = Array.from({ length: 20 }, (_, i) => ({
     id: i + 1,
     nama: "Pandan Wangi",
     kategori: "5 kg",
@@ -12,11 +12,11 @@ const ListProduk = () => {
   }));
 
   return (
-    <div className="p-6 grid grid-cols-2  sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-10">
+    <div className=" px-3 grid grid-cols-2 max-h-[400px] overflow-x-hidden overflow-y-scroll sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
       {produkList.map((produk) => (
         <div
           key={produk.id}
-          className="w-[141px] h-[165px] flex flex-col overflow-hidden rounded-lg shadow bg-white"
+          className="w-[141px] h-[165px] flex flex-col  rounded-lg shadow bg-white"
         >
           {/* Bagian Gambar */}
           <div className="h-1/2 flex items-center justify-center ">

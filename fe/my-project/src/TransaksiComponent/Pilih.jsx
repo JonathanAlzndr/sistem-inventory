@@ -24,7 +24,7 @@ const Pilih = ({ pilihStatus, setPilihStatus }) => {
           <option value="120">120 kg</option>
         </select>
       </header>
-      <div>
+      <div className="mt-3  " >
         <ListProduk/>
       </div>
     </div>
