@@ -2,6 +2,7 @@ import React from "react";
 import GambarBeras from "../assets/gambar/beras.jpeg";
 
 const ListProduk = () => {
+   
   // Contoh data dummy (10 item sama semua)
   const produkList = Array.from({ length: 20 }, (_, i) => ({
     id: i + 1,
@@ -31,14 +32,14 @@ const ListProduk = () => {
           <div className="h-1/2 flex flex-col justify-between p-2 text-[8px]">
             <div className="flex justify-between">
               <section>
-                <p className="font-semibold text-gray-700">Nama</p>
-                <p className="font-semibold text-gray-700">Kategori</p>
-                <p className="font-semibold text-gray-700">Harga</p>
+                <p className=" text-gray-700">Nama</p>
+                <p className=" text-gray-700">Kategori</p>
+                <p className=" text-gray-700">Harga</p>
               </section>
               <section className="text-right">
-                <p className="font-semibold text-gray-700">{produk.nama}</p>
-                <p className="font-semibold text-gray-700">{produk.kategori}</p>
-                <p className="font-semibold text-gray-700">{produk.harga}</p>
+                <p className=" text-gray-700">{produk.nama}</p>
+                <p className=" text-gray-700">{produk.kategori}</p>
+                <p className=" text-gray-700">{produk.harga}</p>
               </section>
             </div>
             <button className="mt-1 text-[8px] w-full p-1 rounded-[4px] bg-blue-400 hover:bg-blue-500 text-white">
