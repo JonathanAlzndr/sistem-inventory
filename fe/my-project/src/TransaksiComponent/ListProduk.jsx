@@ -4,7 +4,7 @@ import GambarBeras from "../assets/gambar/beras.jpeg";
 const ListProduk = () => {
    
   // Contoh data dummy (10 item sama semua)
-  const produkList = Array.from({ length: 20 }, (_, i) => ({
+  const produkList = Array.from({ length:15  }, (_, i) => ({
     id: i + 1,
     nama: "Pandan Wangi",
     kategori: "5 kg",
@@ -42,7 +42,7 @@ const ListProduk = () => {
                 <p className=" text-gray-700">{produk.harga}</p>
               </section>
             </div>
-            <button className="mt-1 text-[8px] w-full p-1 rounded-[4px] bg-blue-400 hover:bg-blue-500 text-white">
+            <button className="mt-1 text-[8px] w-full p-1 rounded-[3px] bg-blue-400 hover:bg-blue-500 text-white">
               Tambah Pesanan
             </button>
           </div>

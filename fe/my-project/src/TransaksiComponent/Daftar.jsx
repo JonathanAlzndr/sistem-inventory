@@ -23,9 +23,9 @@ const Daftar = () => {
 <div className="flex flex-col gap-2 text-white">
   <button
   
-   onClick={() => setShowForm(true)} className="bg-green-400 p-1 rounded-[8px]">Catat</button>
+   onClick={() => setShowForm(true)} className="bg-green-400 hover:bg-green-500 p-1 rounded-[7px]">Catat</button>
       <FormCatat isOpen={showForm} onClose={() => setShowForm(false)} />
-  <button className="bg-red-500 p-1  rounded-[8px]">Batal Pilih Produk</button>
+  <button className="bg-red-500  hover:bg-red-600 p-1  rounded-[7px]">Batal Pilih Produk</button>
 </div>
 
       </div>
