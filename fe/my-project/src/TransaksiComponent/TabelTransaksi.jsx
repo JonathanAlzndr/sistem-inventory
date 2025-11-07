@@ -9,6 +9,7 @@ const TableTransaksi = () => {
   const dataTransaksi = Array.from({ length: 30 }, (_, i) => ({
     no: i + 1,
     id: "T-xxxx-xxxx",
+    nama: "jhon doe" ,
     tanggal: "22-10-2025",
     waktu: "17:00 WITA",
     jumlah: "40",
@@ -26,6 +27,9 @@ const TableTransaksi = () => {
                 <th className="px-3 py-2 border-b border-gray-300">No</th>
                 <th className="px-3 py-2 border-b border-gray-300">
                   ID Transaksi
+                </th>
+                <th className="px-3 py-2 border-b border-gray-300">
+                  Nama Pemesan
                 </th>
                 <th className="px-3 py-2 border-b border-gray-300">Tanggal</th>
                 <th className="px-3 py-2 border-b border-gray-300">
@@ -52,6 +56,9 @@ const TableTransaksi = () => {
                   </td>
                   <td className="border-t border-gray-200 px-3 py-2">
                     {item.id}
+                  </td>
+                  <td className="border-t border-gray-200 px-3 py-2">
+                    {item.nama}
                   </td>
                   <td className="border-t border-gray-200 px-3 py-2">
                     {item.tanggal}
