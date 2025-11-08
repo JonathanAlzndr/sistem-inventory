@@ -23,9 +23,8 @@ def get_image_url(filename):
 def get_all_products():
     limit = request.args.get('limit', 10, type=int)
     offset = request.args.get('offset', 0, type=int)
-    weight = request.args.get('weight', 5, type=int)
 
-    products = get_all_product_service(limit, offset, weight)
+    products = get_all_product_service(limit, offset)
     
     result = [
         {

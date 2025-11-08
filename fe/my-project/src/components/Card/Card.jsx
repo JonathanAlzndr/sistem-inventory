@@ -3,7 +3,7 @@ import { BsFillBoxFill, BsExclamationLg } from "react-icons/bs";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa6";
 
 // URL API kamu
-const API_URL = "http://127.0.0.1:5000/api/products?page=1&size=10&weight=5";
+const API_URL = "http://127.0.0.1:5000/api/products?page=1&size=10";
 
 const Card = () => {
   const [data, setData] = useState({
