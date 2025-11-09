@@ -15,8 +15,8 @@ from repositories.product_repository import (
     delete_product as repo_delete_product
 )
 
-def get_all_product_service(limit: int=10, offset: int=0, weight: int = 5):
-    return repo_get_all_product(limit, offset, weight)
+def get_all_product_service(limit: int=10, offset: int=0):
+    return repo_get_all_product(limit, offset)
 
 def create_product_service(form_data, file):
     

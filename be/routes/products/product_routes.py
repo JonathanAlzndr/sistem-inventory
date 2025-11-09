@@ -23,12 +23,12 @@ def get_image_url(filename):
 def get_all_products():
     limit = request.args.get('limit', 10, type=int)
     offset = request.args.get('offset', 0, type=int)
-    weight = request.args.get('weight', 5, type=int)
 
-    products = get_all_product_service(limit, offset, weight)
+    products = get_all_product_service(limit, offset)
     
     result = [
         {
+
             "productId": p.productId,
             "productName": p.productName,
             "receivedDate": p.receivedDate,
@@ -36,7 +36,9 @@ def get_all_products():
             "currentStock": p.currentStock,
             "status": p.status,
             "sellPrice": p.sellPrice,
+            "purchasePrice":p.purchasePrice,
             "imgPath": get_image_url(p.productImg)
+
         }
         for p in products
     ]
@@ -46,7 +48,7 @@ def get_all_products():
 
 @product_bp.route('/', methods=['POST'])
 @jwt_required()
-@roles_required("Cashier")
+@roles_required("Staff")
 def create_product():
     if 'imgPath' not in request.files:
         return jsonify(msg='Image file is not found'), 400

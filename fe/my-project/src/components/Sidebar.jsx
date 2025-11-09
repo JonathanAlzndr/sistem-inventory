@@ -44,10 +44,10 @@ const ALL_NAV_LINKS = {
 
 // Peta ini hanya memilih link mana yang mau ditampilkan
 const ROLE_NAV_MAP = {
-  pemilik: [ALL_NAV_LINKS.dasbor, ALL_NAV_LINKS.laporan],
-  "admin-gudang": [ALL_NAV_LINKS.dasbor, ALL_NAV_LINKS.produk],
-  kasir: [ALL_NAV_LINKS.dasbor, ALL_NAV_LINKS.transaksi],
-  default: [ALL_NAV_LINKS.dasbor],
+  Owner: [ALL_NAV_LINKS.dasbor, ALL_NAV_LINKS.laporan],
+  Staff: [ALL_NAV_LINKS.dasbor, ALL_NAV_LINKS.produk],
+  Cashier: [ALL_NAV_LINKS.dasbor, ALL_NAV_LINKS.transaksi],
+  User: [ALL_NAV_LINKS.dasbor],
 };
 
 export default function Sidebar() {

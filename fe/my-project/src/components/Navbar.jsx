@@ -8,9 +8,9 @@ export default function Navbar({ title, subtitle }) {
 
   // Fungsi untuk menampilkan nama role yang lebih rapi
   const getRoleName = () => {
-    if (role === "pemilik") return "Pemilik";
-    if (role === "kasir") return "Kasir";
-    if (role === "admin-gudang") return "Admin Gudang";
+    if (role === "Owner") return "Pemilik";
+    if (role === "Cashier") return "Kasir";
+    if (role === "Staff") return "Admin Gudang";
     return "Pengguna"; // Cadangan
   };
 
