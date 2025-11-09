@@ -4,7 +4,7 @@ from services.product_service import (
     get_all_product_service, 
     create_product_service, 
     get_product_by_id_service, 
-    delete_product_service, 
+    deactivate_product_service, 
     update_product_service
 )
 from utils.decorators import roles_required
@@ -23,8 +23,9 @@ def get_image_url(filename):
 def get_all_products():
     limit = request.args.get('limit', 10, type=int)
     offset = request.args.get('offset', 0, type=int)
+    include_unavailable = request.args.get('include_unavailable', 'false').lower() == 'true'
 
-    products = get_all_product_service(limit, offset)
+    products = get_all_product_service(limit, offset, include_unavailable)
     
     result = [
         {
@@ -37,8 +38,8 @@ def get_all_products():
             "status": p.status,
             "sellPrice": p.sellPrice,
             "purchasePrice":p.purchasePrice,
-            "imgPath": get_image_url(p.productImg)
-
+            "imgPath": get_image_url(p.productImg),
+            "is_available": p.isAvailable
         }
         for p in products
     ]
@@ -94,23 +95,29 @@ def get_product_by_id(productId):
                 "status": product.status,
                 "sellPrice": product.sellPrice,
                 "purchasePrice": product.purchasePrice,
-                "productImg": get_image_url(product.productImg)
+                "productImg": get_image_url(product.productImg),
+                "isAvailable": product.isAvailable
             }
         }), 200
     else:
         return jsonify({"msg": "Product not found"}), 404
 
-@product_bp.route('/<int:productId>', methods=['DELETE'])
+@product_bp.route('/<int:productId>', methods=['PATCH'])
 @jwt_required()
 @roles_required('Staff')
-def delete_product(productId):
+def deactivate_product(productId):
     try:
-        delete_product_service(productId)
-        return jsonify({"msg": "Success to delete product"}), 200
+        result = deactivate_product_service(productId)
+
+        if not result:
+            return jsonify({"msg": "Product already inactive"}), 200
+
+        return jsonify({"msg": "Product successfully deactivated"}), 200
+
     except ProductNotFound as e:
         return jsonify({"msg": str(e)}), 404
     except Exception as e:
-        return jsonify({"msg": f"Failed to delete product: {str(e)}"}), 500
+        return jsonify({"msg": f"Failed to deactivate product: {str(e)}"}), 500
 
 @product_bp.route('/<int:productId>', methods=['PATCH'])
 @jwt_required()
