@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-const FormCatat = ({ isOpen, onClose, cart ,setRefreshTrigger}) => {
+const FormCatat = ({ isOpen, onClose, cart, setRefreshTrigger,setCart }) => {
   if (!isOpen) return null;
 
   // State input user
-  const [namaPemesan, setNamaPemesan] = useState("");
+  const [customerName, setcustomerName] = useState("");
   const [tanggal, setTanggal] = useState("");
   const [waktu, setWaktu] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,6 +19,11 @@ const FormCatat = ({ isOpen, onClose, cart ,setRefreshTrigger}) => {
   const handleSimpan = async () => {
     if (cart.length === 0) {
       alert("Tidak ada produk yang dipilih!");
+      return;
+    }
+
+    if (!customerName) {
+      alert("Nama pemesan tidak boleh kosong!");
       return;
     }
 
@@ -37,6 +42,7 @@ const FormCatat = ({ isOpen, onClose, cart ,setRefreshTrigger}) => {
           productId: item.productId || item.id,
           jumlah: item.jumlah || 1,
         })),
+        customerName: customerName,
       };
 
       const res = await fetch("http://127.0.0.1:5000/api/transaction/", {
@@ -59,15 +65,16 @@ const FormCatat = ({ isOpen, onClose, cart ,setRefreshTrigger}) => {
       console.log("Transaksi berhasil:", data);
       alert("Transaksi berhasil dicatat!");
 
-        // Trigger refresh tabel
-    setRefreshTrigger(prev => prev + 1);
+      // Trigger refresh tabel
+      setRefreshTrigger((prev) => prev + 1);
 
-    // Reset form & tutup
-    setNamaPemesan("");
-    setTanggal("");
-    setWaktu("");
-    onClose();
-
+      setCart([]);
+      
+      // Reset form & tutup
+      setcustomerName("");
+      setTanggal("");
+      setWaktu("");
+      onClose();
     } catch (err) {
       console.error("Error simpan transaksi:", err);
       alert(err.message);
@@ -99,8 +106,8 @@ const FormCatat = ({ isOpen, onClose, cart ,setRefreshTrigger}) => {
             <label className="text-gray-700 mb-1">Nama Pemesan</label>
             <input
               type="text"
-              value={namaPemesan}
-              onChange={(e) => setNamaPemesan(e.target.value)}
+              value={customerName}
+              onChange={(e) => setcustomerName(e.target.value)}
               className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-400"
               placeholder="Masukkan nama pemesan"
             />

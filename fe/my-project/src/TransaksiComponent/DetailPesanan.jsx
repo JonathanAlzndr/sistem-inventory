@@ -69,7 +69,7 @@ function DetailPesanan({ isOpen, onClose, transactionId }) {
                   <p className="text-base font-semibold text-gray-900">T-{transaction.transactionId}</p>
                   <div className="mt-2">
                     <p className="font-medium text-gray-500 uppercase tracking-wider">Nama Pemesan</p>
-                    <p className="text-base font-semibold text-gray-900">{transaction.cashier}</p>
+                    <p className="text-base font-semibold text-gray-900">{transaction.customerName}</p>
                   </div>
                 </div>
                 <div className="flex-1" />

@@ -64,16 +64,23 @@ export default function ProdukTabel({
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://127.0.0.1:5000/api/products/${id}/deactivate`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `http://127.0.0.1:5000/api/products/${id}/deactivate`,
+        {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       const data = await res.json();
       if (res.ok) {
         alert("Produk berhasil dihapus!");
         // ⬇ Hapus produk dari state langsung tanpa fetch ulang
-        setProdukList((prev) => prev.filter((p) => p.productId !== id));
+        setProdukList((prev) =>
+          prev.map((p) =>
+            p.productId === id ? { ...p, isAvailable: false } : p
+          )
+        );
       } else {
         alert(data.msg || "Gagal menghapus produk");
       }

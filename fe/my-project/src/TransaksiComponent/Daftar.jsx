@@ -42,7 +42,8 @@ const Daftar = ({ cart, setCart,refreshTrigger,setRefreshTrigger }) => {
           >
             Catat
           </button>
-          <FormCatat  cart={cart} isOpen={showForm} setRefreshTrigger={setRefreshTrigger}  refreshTrigger={refreshTrigger} onClose={() => setShowForm(false)} />
+
+          <FormCatat  cart={cart} isOpen={showForm} setRefreshTrigger={setRefreshTrigger}  refreshTrigger={refreshTrigger} onClose={() => setShowForm(false)} setCart={setCart} />
           <button
             onClick={() => setCart([])}
             className="bg-red-500 hover:bg-red-600 p-2 rounded-[7px]"

@@ -51,15 +51,19 @@ def get_all_transaction():
 
     transactions = get_all_transactions_service(limit, offset)
 
-    result = [
-        {
+    result = []
+    for t in transactions:
+        # Hitung total item secara manual dari relasi order_details
+        total_items_count = sum(detail.quantity for detail in t.order_details)
+        item = {
             "transactionId": t.saleId, 
             "transactionDate": t.saleDate.isoformat(),
-            "totalItems": t.totalItems, 
+            "customerName": t.customerName,
+            "totalItems": total_items_count,
             "totalPrice": str(t.totalPrice)
         }
-        for t in transactions
-    ]
+        result.append(item)
+    
     
     return jsonify({"transactionList": result}), 200
 
