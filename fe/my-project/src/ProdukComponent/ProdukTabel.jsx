@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import BttnEkspor from "../kecilComponent/bttnEkspor";
 
-export default function ProdukTabel() {
-  const [produkList, setProdukList] = useState([]);
+export default function ProdukTabel({
+  setEditData,
+  setProdukList,
+  produkList,
+}) {
   const [loading, setLoading] = useState(true);
 
   const handleExport = () => {
     alert("Fitur ekspor data masih coming soon 🚀");
   };
 
+  // Ambil data produk saat pertama kali load
   const fetchProduk = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -19,30 +23,29 @@ export default function ProdukTabel() {
         return;
       }
 
-      const res = await fetch("http://127.0.0.1:5000/api/products/?limit=20&offset=0", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // ✅ Wajib agar tidak 401
-        },
-      });
+      const res = await fetch(
+        "http://127.0.0.1:5000/api/products/?limit=20&offset=0",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) {
-        // Kalau token salah / expired
         if (res.status === 401) {
-          alert("Sesi Anda telah berakhir. Silakan login ulang.");
+          alert("Sesi Anda berakhir, silakan login ulang.");
           localStorage.removeItem("token");
-          window.location.href = "/"; 
+          window.location.href = "/";
           return;
         }
-
-  
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.msg || "Gagal mengambil data produk");
       }
 
       const data = await res.json();
       setProdukList(data.productList || []);
-      console.log(data)
     } catch (err) {
       console.error("Fetch error:", err);
       alert("Terjadi kesalahan saat mengambil data produk");
@@ -52,19 +55,39 @@ export default function ProdukTabel() {
   };
 
   useEffect(() => {
-  fetchProduk();
-
-  const refreshHandler = () => {
     fetchProduk();
+  }, []); //  hanya dijalankan sekali
+
+  //  Hapus produk langsung dari list
+  const handleDelete = async (id) => {
+    if (!confirm("Yakin ingin menghapus produk ini?")) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://127.0.0.1:5000/api/products/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("Produk berhasil dihapus!");
+        // ⬇ Hapus produk dari state langsung tanpa fetch ulang
+        setProdukList((prev) => prev.filter((p) => p.productId !== id));
+      } else {
+        alert(data.msg || "Gagal menghapus produk");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan server saat menghapus produk!");
+    }
   };
-   window.addEventListener("storage", refreshHandler);
-  return () => window.removeEventListener("storage", refreshHandler);
-}, []);
 
   if (loading) {
-    return <p className="text-gray-500 text-center mt-4">Memuat data produk...</p>;
+    return (
+      <p className="text-gray-500 text-center mt-4">Memuat data produk...</p>
+    );
   }
-
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6 w-full">
@@ -132,10 +155,16 @@ export default function ProdukTabel() {
                       : "-"}
                   </td>
                   <td className="p-3 flex justify-center gap-3">
-                    <button className="p-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded-md">
+                    <button
+                      onClick={() => setEditData(item)}
+                      className="p-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded-md"
+                    >
                       <FaEdit />
                     </button>
-                    <button className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-md">
+                    <button
+                      onClick={() => handleDelete(item.productId)}
+                      className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-md"
+                    >
                       <FaTrash />
                     </button>
                   </td>

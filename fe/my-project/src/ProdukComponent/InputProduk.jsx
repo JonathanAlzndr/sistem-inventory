@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MdAddPhotoAlternate, MdClose } from "react-icons/md";
 import InputKategori from "./InputKategori";
 import {
@@ -6,7 +6,7 @@ import {
   MdOutlineKeyboardArrowUp,
 } from "react-icons/md";
 
-const InputProduk = () => {
+const InputProduk = ({ editData, setProdukList, produkList }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     productName: "",
@@ -18,6 +18,26 @@ const InputProduk = () => {
     imgFile: null,
     imgPreview: null,
   });
+
+  useEffect(() => {
+    if (editData) {
+      setIsOpen(true); // buka form otomatis
+      setFormData({
+        productName: editData.productName || "",
+        receivedDate: editData.receivedDate
+          ? new Date(editData.receivedDate).toISOString().split("T")[0]
+          : "",
+        weight: editData.weight || "",
+        currentStock: editData.currentStock || "",
+        sellPrice: editData.sellPrice || "",
+        purchasePrice: editData.purchasePrice || "",
+        imgFile: null,
+        imgPreview: editData.imgPath || null, // tampilkan gambar lama
+      });
+    }
+  }, [editData]);
+
+  const isEditMode = Boolean(editData);
 
   // Update state untuk input
   const handleChange = (e) => {
@@ -67,34 +87,72 @@ const InputProduk = () => {
 
     try {
       const token = localStorage.getItem("token");
-      console.log("Token:", token);
-      const form = new FormData();
-      form.append("productName", formData.productName);
-      form.append("receivedDate", formData.receivedDate);
-      form.append("weight", parseFloat(formData.weight));
-      form.append("currentStock", parseInt(formData.currentStock));
-      form.append("sellPrice", parseFloat(formData.sellPrice));
-      form.append("purchasePrice", parseFloat(formData.purchasePrice));
-      if (formData.imgFile) form.append("imgPath", formData.imgFile);
-      else return alert("Silakan isi gambar produk!");
+      const isEdit = !!editData; // true kalau lagi edit
 
-      const res = await fetch("http://127.0.0.1:5000/api/products/", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: form,
-      });
+      let res;
+      if (isEdit) {
+        // === UPDATE PRODUK ===
+        const url = `http://127.0.0.1:5000/api/products/${editData.productId}`;
+        res = await fetch(url, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            productName: formData.productName,
+            receivedDate: new Date(formData.receivedDate).toISOString(),
+            weight: parseFloat(formData.weight),
+            currentStock: parseInt(formData.currentStock),
+            sellPrice: parseFloat(formData.sellPrice),
+            purchasePrice: parseFloat(formData.purchasePrice),
+            imgPath: editData.imgPath, // pakai gambar lama
+          }),
+        });
+      } else {
+        // === TAMBAH PRODUK BARU ===
+        const form = new FormData();
+        form.append("productName", formData.productName);
+        form.append(
+          "receivedDate",
+          new Date(formData.receivedDate).toISOString()
+        );
+        form.append("weight", parseFloat(formData.weight));
+        form.append("currentStock", parseInt(formData.currentStock));
+        form.append("sellPrice", parseFloat(formData.sellPrice));
+        form.append("purchasePrice", parseFloat(formData.purchasePrice));
+        if (formData.imgFile) form.append("imgPath", formData.imgFile);
+        else return alert("Silakan isi gambar produk!");
+
+        res = await fetch("http://127.0.0.1:5000/api/products/", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: form,
+        });
+      }
 
       const data = await res.json();
 
       if (res.ok) {
-        alert("Produk berhasil dibuat!");
+        alert(isEdit ? "Produk berhasil diubah!" : "Produk berhasil dibuat!");
+
+        // Update state list produk biar tabel auto-update
+        if (isEdit) {
+          setProdukList((prev) =>
+            prev.map((p) =>
+              p.productId === editData.productId
+                ? { ...p, ...data.product } // ⬅️ gabung field lama + baru
+                : p
+            )
+          );
+        } else {
+          setProdukList((prev) => [...prev, data.product]);
+        }
+
         handleReset();
         setIsOpen(false);
-        
       } else {
-        alert(data.msg || "Gagal membuat produk");
+        alert(data.msg || "Gagal menyimpan produk");
       }
     } catch (err) {
       console.error(err);
@@ -109,7 +167,7 @@ const InputProduk = () => {
         onClick={() => setIsOpen(!isOpen)}
         className="flex gap-2 justify-center items-center text-gray-700 font-medium"
       >
-        Tambah Produk{" "}
+        {editData ? "Edit Produk" : "Tambah Produk"}{" "}
         {isOpen ? (
           <MdOutlineKeyboardArrowUp className="text-2xl transition-transform duration-300" />
         ) : (
@@ -250,7 +308,11 @@ const InputProduk = () => {
           <div className="flex h-[45px] gap-4 w-full mt-5">
             <button
               type="button"
-              onClick={handleReset}
+              onClick={() => {
+                handleReset(); // reset semua input
+       
+                setIsOpen(false); // tutup form ke mode tambah
+              }}
               className="bg-red-500 text-white rounded-md hover:bg-red-600 transition w-full mt-2"
             >
               Batal
