@@ -44,7 +44,7 @@ def create_transaction():
 
 @transaction_bp.route('/', methods=['GET'])
 @jwt_required()
-@roles_required('Cashier', 'Owner')
+# @roles_required('Cashier', 'Owner','staff') di hapus untuk get transaksi untuk dashboard semua roel
 def get_all_transaction():
     limit = request.args.get('limit', 10, type=int)
     offset = request.args.get('offset', 0, type=int)
@@ -69,7 +69,7 @@ def get_all_transaction():
 
 @transaction_bp.route('/<int:transactionId>', methods=['GET'])
 @jwt_required()
-@roles_required("Cashier")
+# @roles_required("Cashier") di hapus untuk get transaksi untuk dashboard semua roel
 def get_transaction_detail(transactionId):
     
     try:
