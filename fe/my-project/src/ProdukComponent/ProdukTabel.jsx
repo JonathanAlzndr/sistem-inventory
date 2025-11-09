@@ -10,7 +10,7 @@ export default function ProdukTabel({
   const [loading, setLoading] = useState(true);
 
   const handleExport = () => {
-    alert("Fitur ekspor data masih coming soon 🚀");
+    alert("Fitur ekspor data ");
   };
 
   // Ambil data produk saat pertama kali load

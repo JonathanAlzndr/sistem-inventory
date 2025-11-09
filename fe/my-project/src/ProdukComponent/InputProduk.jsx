@@ -6,7 +6,7 @@ import {
   MdOutlineKeyboardArrowUp,
 } from "react-icons/md";
 
-const InputProduk = ({ editData, setProdukList, produkList }) => {
+const InputProduk = ({ editData, setProdukList }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     productName: "",
@@ -37,7 +37,7 @@ const InputProduk = ({ editData, setProdukList, produkList }) => {
     }
   }, [editData]);
 
-  const isEditMode = Boolean(editData);
+  
 
   // Update state untuk input
   const handleChange = (e) => {

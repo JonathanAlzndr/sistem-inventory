@@ -1,28 +1,39 @@
 import React from "react";
 import GambarBeras from "../assets/gambar/beras.jpeg";
 
-const CardTransaksi = () => {
-  // Contoh data dummy (10 item sama semua)
-  const produkList = Array.from({ length: 5 }, (_, i) => ({
-    id: i + 1,
-    nama: "Pandan Wangi",
-    kategori: "5 kg",
-    harga: "Rp.80.000",
-    gambar: GambarBeras,
-  }));
+const CardTransaksi = ({ cart, setCart }) => {
+  if (!cart || cart.length === 0) {
+    return (
+      <div className="text-gray-500 text-center py-10">
+        Belum ada produk yang dipilih
+      </div>
+    );
+  }
+
+  // Update jumlah produk
+  const updateQty = (productId, jumlahBaru) => {
+    if (jumlahBaru < 1) jumlahBaru = 1;
+    setCart(cart.map(item =>
+      item.productId === productId ? { ...item, jumlah: jumlahBaru } : item
+    ));
+  };
+
+  // Hapus produk dari cart
+  const removeItem = (productId) => {
+    setCart(cart.filter(item => item.productId !== productId));
+  };
 
   return (
-    <>
-    <div className=" overflow-y-scroll max-h-76 space-y-2  ">
-      {produkList.map((produk) => (
+    <div className="overflow-y-scroll max-h-76 space-y-2">
+      {cart.map((produk) => (
         <div
-          key={produk.id}
-          className="flex items-center rounded-[10px] h-[93px] w-full shadow bg-white    "
+          key={produk.productId || produk.id}
+          className="flex items-center rounded-[10px] h-[93px] w-full shadow bg-white relative"
         >
           {/* Gambar Produk */}
           <img
-            src={produk.gambar}
-            alt={produk.nama}
+            src={produk.imgPath || produk.gambar || GambarBeras}
+            alt={produk.nama || produk.productName}
             className="h-full w-[90px] object-cover"
           />
 
@@ -31,28 +42,37 @@ const CardTransaksi = () => {
             {/* Bagian atas: Nama produk dan info kanan */}
             <div className="flex justify-between items-start">
               <div>
-                <p className="font-semibold">{produk.nama}</p>
+                <p className="font-semibold">{produk.nama || produk.productName}</p>
                 <p className="text-gray-500 text-[10px] leading-tight">
-                  {produk.harga}
+                  Rp{Number(produk.harga || produk.sellPrice || 0).toLocaleString()}
                 </p>
               </div>
               <div className="text-right">
-                <p>{produk.kategori}</p>
+                <p>{produk.kategori || (produk.weight ? produk.weight + " kg" : "-")}</p>
               </div>
             </div>
 
-            {/* Bagian bawah: Tombol Transaksi + Counter */}
+            {/* Bagian bawah: Tombol Batal + Counter */}
             <div className="flex justify-between items-center mt-1">
-              <button className="border border-gray-400 rounded px-2 py-[2px] text-gray-600 hover:bg-gray-100 transition">
-                Transaksi
+              <button
+                onClick={() => removeItem(produk.productId || produk.id)}
+                className="border border-gray-400 rounded px-2 py-[2px] text-gray-600 hover:bg-gray-100 transition"
+              >
+                Batal
               </button>
 
               <div className="flex items-center gap-2 text-gray-700">
-                <button className=" hover:border rounded w-5 h-5 flex items-center justify-center hover:bg-gray-100">
+                <button
+                  onClick={() => updateQty(produk.productId || produk.id, produk.jumlah - 1)}
+                  className="hover:border rounded w-5 h-5 flex items-center justify-center hover:bg-gray-100"
+                >
                   –
                 </button>
-                <span>1</span>
-                <button className="hover:border rounded w-5 h-5 flex items-center justify-center hover:bg-gray-100">
+                <span>{produk.jumlah}</span>
+                <button
+                  onClick={() => updateQty(produk.productId || produk.id, produk.jumlah + 1)}
+                  className="hover:border rounded w-5 h-5 flex items-center justify-center hover:bg-gray-100"
+                >
                   +
                 </button>
               </div>
@@ -60,8 +80,7 @@ const CardTransaksi = () => {
           </div>
         </div>
       ))}
-      </div>
-    </>
+    </div>
   );
 };
 

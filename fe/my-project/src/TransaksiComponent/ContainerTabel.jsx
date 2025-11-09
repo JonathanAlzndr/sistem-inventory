@@ -5,7 +5,7 @@ import TabelTransaksi from "./TabelTransaksi";
 const ContainerTabel = () => {
   return (
     <>
-      <div className="bg-white shadow h-[449px] w-full p-4 px-6 rounded-[10px]">
+      <div className="bg-white shadow h-[449px] w-[1225px] p-4 px-6 rounded-[10px]">
         <header className="flex justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-700">

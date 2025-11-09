@@ -2,7 +2,7 @@ import React from "react";
 import ListProduk from "./ListProduk";
 
 
-const Pilih = ({ pilihStatus, setPilihStatus }) => {
+const Pilih = ({ pilihStatus, setPilihStatus, cart,setCart}) => {
   return (
     <div className="p-3 px-6  bg-white/80 rounded-[10px] shadow-md  w-[790px] h-[514px]">
       <header className=" flex justify-between">
@@ -25,7 +25,7 @@ const Pilih = ({ pilihStatus, setPilihStatus }) => {
         </select>
       </header>
       <div className="mt-3  " >
-        <ListProduk/>
+        <ListProduk  cart={cart} setCart={setCart} />
       </div>
     </div>
   );
