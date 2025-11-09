@@ -16,6 +16,7 @@ Cashier
 ### Request Body: 
 ```json 
 {   
+  "customerName": "John Doe",
   "items": [
     {
         "productId": 12,
@@ -35,6 +36,7 @@ Cashier
   "transactionId": 1,
   "transactionDate": "2025-10-25T11:15:33Z",
   "cashier": "Budi",
+  "customerName": "John Doe",
   "items": [
     { 
         "productName": "beras A", 
@@ -153,6 +155,7 @@ Cashier
     "transactionId": 1,
     "transactionDate": "2025-10-25T11:15:33Z",
     "cashier": "Budi",
+    "customerName": "John Doe",
     "items": [
         { 
             "productName": "beras A", 
