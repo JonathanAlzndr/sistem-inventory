@@ -13,6 +13,7 @@ class Product(db.Model):
     sellPrice = db.Column(db.Numeric(10, 2), nullable=False)
     purchasePrice = db.Column(db.Numeric(10, 2), nullable=False)
     productImg = db.Column(db.String(255), nullable=True)
+    isAvailable = db.Column(db.Boolean, default=True, nullable=False)
 
     order_details = db.relationship("OrderDetail", back_populates="product")
 

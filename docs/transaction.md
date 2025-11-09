@@ -13,10 +13,10 @@ Cashier
 
 ### Endpoint : `POST api/transaction`
 
-### Request Body:
-
-```json
-{
+### Request Body: 
+```json 
+{   
+  "customerName": "John Doe",
   "items": [
     {
       "productId": 12,
@@ -37,6 +37,7 @@ Cashier
   "transactionId": 1,
   "transactionDate": "2025-10-25T11:15:33Z",
   "cashier": "Budi",
+  "customerName": "John Doe",
   "items": [
     {
       "productName": "beras A",
@@ -134,7 +135,7 @@ Cashier, Owner
 
 ---
 
-### Get Transaction Detail
+## Get Transaction Detail
 
 **Description:**  
 Get Detail of a Transaction
@@ -145,7 +146,7 @@ Required (Bearer Token)
 **Access:**
 Cashier
 
-### Endpoint: `GET api/transaction/{transactionId}
+### Endpoint: `GET api/transaction/{transactionId}`
 
 ### Path Variable
 
@@ -157,24 +158,25 @@ Cashier
 
 ```json
 {
-  "transactionId": 1,
-  "transactionDate": "2025-10-25T11:15:33Z",
-  "cashier": "Budi",
-  "items": [
-    {
-      "productName": "beras A",
-      "sellPrice": "3000.00",
-      "quantity": 2,
-      "subtotal": "6000.00"
-    },
-    {
-      "productName": "beras B",
-      "sellPrice": 12000,
-      "quantity": 1,
-      "subtotal": "12000.00"
-    }
-  ],
-  "totalPrice": "18000.00"
+    "transactionId": 1,
+    "transactionDate": "2025-10-25T11:15:33Z",
+    "cashier": "Budi",
+    "customerName": "John Doe",
+    "items": [
+        { 
+            "productName": "beras A", 
+            "sellPrice": "3000.00", 
+            "quantity": 2, 
+            "subtotal": "6000.00"
+        },
+        { 
+            "productName": "beras B",
+            "sellPrice": 12000,
+            "quantity": 1, 
+            "subtotal": "12000.00"
+        }
+    ],
+    "totalPrice": "18000.00"
 }
 ```
 
@@ -213,4 +215,8 @@ Cashier
 {
   "msg": "You do not have permission to access this resource."
 }
-```
+
+
+
+
+

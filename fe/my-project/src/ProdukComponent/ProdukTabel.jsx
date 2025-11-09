@@ -64,8 +64,8 @@ export default function ProdukTabel({
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://127.0.0.1:5000/api/products/${id}`, {
-        method: "DELETE",
+      const res = await fetch(`http://127.0.0.1:5000/api/products/${id}/deactivate`, {
+        method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
       });
 

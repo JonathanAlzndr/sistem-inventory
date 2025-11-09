@@ -76,8 +76,8 @@ let url = "http://127.0.0.1:5000/api/products/";
           nama: produk.productName,
           harga: Number(produk.sellPrice),
           jumlah: 1,
-          imgPath: produk.imgPath, // tambahkan ini
-          kategori: produk.weight + " kg", // tambahkan ini
+          imgPath: produk.imgPath, 
+          kategori: produk.weight + " kg", 
         },
       ]);
     }

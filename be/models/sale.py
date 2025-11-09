@@ -8,7 +8,7 @@ class Sale(db.Model):
     saleId = db.Column(db.Integer, primary_key=True) 
     saleDate = db.Column(db.TIMESTAMP, nullable=False, default=datetime.utcnow) 
     totalPrice = db.Column(db.Numeric(10, 2), nullable=False)
-
+    customerName = db.Column(db.String(255), nullable=False)
     userId = db.Column(db.Integer, db.ForeignKey('User.userId'), nullable=False)
 
     user = db.relationship("User", back_populates="sales")

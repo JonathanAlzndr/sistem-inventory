@@ -7,7 +7,7 @@ from repositories.product_repository import get_product_by_id
 from repositories.sale_repository import get_all_transaction, get_transaction_detail_by_id
 from models import Sale, OrderDetail
 
-def create_new_transaction_service(items_list, cashier_id):
+def create_new_transaction_service(items_list, cashier_id, customer_name):
     cashier = get_user_by_id(cashier_id)
     
     if not cashier:
@@ -23,7 +23,8 @@ def create_new_transaction_service(items_list, cashier_id):
         new_sale = Sale(
             userId = cashier_id,
             saleDate=datetime.now(timezone.utc),
-            totalPrice=Decimal('0.00') 
+            totalPrice=Decimal('0.00'),
+            customerName=customer_name
         )
         db.session.add(new_sale)
         
@@ -47,6 +48,7 @@ def create_new_transaction_service(items_list, cashier_id):
                         "productId": product.productId,
                         "productName": product.productName,
                         "currentStock": product.currentStock,
+                
                         "requested": requested_qty
                     }
                 )
@@ -79,6 +81,7 @@ def create_new_transaction_service(items_list, cashier_id):
             "transactionId": new_sale.saleId,
             "transactionDate": new_sale.saleDate.isoformat(),
             "cashier": cashier.username, 
+            "customerName": new_sale.customerName,
             "items": processed_items_for_response,
             "totalPrice": str(total_price)
         }
@@ -113,6 +116,7 @@ def get_transaction_detail_service(sale_id: int):
         "transactionId": sale.saleId,
         "transactionDate": sale.saleDate.isoformat(),
         "cashier": sale.user.username,
+        "customerName": sale.customerName,
         "items": items_list,
         "totalPrice": str(sale.totalPrice)
     }

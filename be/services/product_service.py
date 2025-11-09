@@ -12,7 +12,7 @@ from repositories.product_repository import (
     get_all_product as repo_get_all_product,
     create_new_product as repo_create_product,
     get_product_by_id as repo_get_product_by_id,
-    delete_product as repo_delete_product
+    deactivate_product as repo_deactivate_product
 )
 #tambah weight supaya bisa filter kg beras
 def get_all_product_service(limit: int=10, offset: int=0, weight: int=None):
@@ -61,7 +61,7 @@ def create_product_service(form_data, file):
             "currentStock": current_stock,
             "sellPrice": sell_price,
             "purchasePrice": purchase_price,
-            "productImg": unique_filename
+            "productImg": unique_filename,
         }
         
         new_product = repo_create_product(product_data)
@@ -76,8 +76,12 @@ def create_product_service(form_data, file):
 def get_product_by_id_service(productId):
     return repo_get_product_by_id(productId)
 
-def delete_product_service(productId):
-    return repo_delete_product(productId)
+def deactivate_product_service(productId):
+    try:
+        result = repo_deactivate_product(productId)
+        return result
+    except ProductNotFound as e:
+        raise e
 
 def update_product_service(product_id, update_data):
     product = repo_get_product_by_id(product_id)

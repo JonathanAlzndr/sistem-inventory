@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import DetailPesanan from "./DetailPesanan";
-import DeleteKonfirmasi from "./DeleteKonfirmasi";
+// Pastikan nama file modal konfirmasi Anda benar
+import DeleteKonfirmasi from "./DeleteKonfirmasi"; 
 
 const TableTransaksi = ({ refreshTrigger }) => {
   const [transactionList, setTransactionList] = useState([]);
   const [showDetail, setShowDetail] = useState(false);
   const [selectedTransactionId, setSelectedTransactionId] = useState(null);
-
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
@@ -46,15 +46,13 @@ const TableTransaksi = ({ refreshTrigger }) => {
     setSelectedTransactionId(transactionId);
     setShowDetail(true);
   };
-  
 
-const executeDelete = async (password) => {
+  const executeDelete = async (password) => {
     if (!password) {
       alert("Password tidak boleh kosong!");
       return;
     }
 
- 
     console.log("Password diterima. Memproses hapus untuk ID:", idToDelete);
 
     try {
@@ -90,11 +88,9 @@ const executeDelete = async (password) => {
       alert(`Error: ${err.message}`);
     }
 
-    // 4. Tutup modal setelah semua selesai
     setShowDeleteModal(false);
     setIdToDelete(null);
   };
-
 
   return (
     <div className="w-full overflow-x-auto mt-3">
@@ -106,7 +102,13 @@ const executeDelete = async (password) => {
               <th className="px-3 py-2 border-b border-gray-300">
                 ID Transaksi
               </th>
+              {/* KOLOM BARU 1 */}
+              <th className="px-3 py-2 border-b border-gray-300">
+                Nama Pemesan
+              </th>
               <th className="px-3 py-2 border-b border-gray-300">Tanggal</th>
+              {/* KOLOM BARU 2 */}
+              <th className="px-3 py-2 border-b border-gray-300">Waktu</th>
               <th className="px-3 py-2 border-b border-gray-300">Total Item</th>
               <th className="px-3 py-2 border-b border-gray-300">
                 Total Harga
@@ -125,9 +127,26 @@ const executeDelete = async (password) => {
                   {index + 1}
                 </td>
                 <td className="border-t border-gray-200 px-3 py-2">{`T-${trx.transactionId}`}</td>
+                
+                {/* DATA BARU 1 */}
                 <td className="border-t border-gray-200 px-3 py-2">
-                  {new Date(trx.transactionDate).toLocaleDateString()}
+                  {trx.customerName || "-"}
                 </td>
+                
+                <td className="border-t border-gray-200 px-3 py-2">
+                  {/* Hanya Tanggal */}
+                  {new Date(trx.transactionDate).toLocaleDateString("id-ID")}
+                </td>
+                
+                {/* DATA BARU 2 */}
+                <td className="border-t border-gray-200 px-3 py-2">
+                  {/* Hanya Waktu */}
+                  {new Date(trx.transactionDate).toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </td>
+                
                 <td className="border-t border-gray-200 px-3 py-2">
                   {trx.totalItems}
                 </td>
@@ -142,14 +161,14 @@ const executeDelete = async (password) => {
                     Detail
                   </button>
                 </td>
-                <td className="border-t border-gray-200 px-3 flex  justify-center py-2">
-                  <button 
-                 onClick={() => {
-                      // Simpan ID yang mau dihapus & buka modal
+                <td className="border-t border-gray-200 px-3 flex justify-center py-2">
+                  <button
+                    onClick={() => {
                       setIdToDelete(trx.transactionId);
                       setShowDeleteModal(true);
                     }}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 transition">
+                    className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 transition"
+                  >
                     <FaTrash className="text-red-500  hover:text-red-700" />
                   </button>
                 </td>
@@ -168,7 +187,7 @@ const executeDelete = async (password) => {
         />
       )}
 
-      {/* 6. Render Modal Konfirmasi Hapus di sini */}
+      {/* Modal Konfirmasi Hapus */}
       {showDeleteModal && (
         <DeleteKonfirmasi
           isOpen={showDeleteModal}

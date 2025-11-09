@@ -36,13 +36,14 @@ def create_new_product(data):
 def get_product_by_id(productId):
     return Product.query.get(productId)
 
-def delete_product(productId):
+def deactivate_product(productId):
     product = Product.query.get(productId)
 
     if not product:
-        return False
+        raise ProductNotFound(f"Product with id {productId} not found") 
     
-    db.session.delete(product)
+    if not product.isAvailable:
+        return False 
+    product.isAvailable = False
     db.session.commit()
-
     return True

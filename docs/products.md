@@ -11,7 +11,7 @@ Required (Bearer Token)
 **Access:**
 All Users
 
-### Endpoint : `GET api/products?page=1&size=10&weight=5`
+### Endpoint : `GET api/products?page=1&size=10&weight=5&include_unavailable=true`
 
 ### Query Parameters (Optional)
 
@@ -19,7 +19,7 @@ All Users
 | --------- | ----- | ------------------------------------------- |
 | `limit`   | `int` | Page number for pagination (default: `10`). |
 | `offset`  | `int` | Number of products per page (default: `0`). |
-| `weight`  | `int` | Filter products by weight.                  |
+| `include_unavailable`  | `bool` | Filter products by availability                  |
 
 ### Response Body (Success):
 
@@ -35,7 +35,8 @@ All Users
       "currentStock": 112,
       "status": "Aman",
       "price": "15000.00",
-      "imgPath": "image.jpg"
+      "imgPath": "image.jpg",
+      "is_available": "true"
     },
     {
       "productId": "10",
@@ -45,7 +46,8 @@ All Users
       "currentStock": 112,
       "status": "Aman",
       "price": "15500.00",
-      "imgPath": "image.jpg"
+      "imgPath": "image.jpg",
+      "is_available": "false"
     }
   ]
 }
@@ -94,17 +96,18 @@ Staff
     "currentStock": 112,
     "status": "Aman",
     "price": "15500.00",
-    "imgPath": "image.jpg"
+    "imgPath": "image.jpg",
+    "isAvailable": "false"
   }
 }
 ```
 
 ---
 
-## Delete Product by Id
+## Deactivate Product by Id
 
 **Description:**  
-Delete a product by Id
+Deactivate a product by Id
 
 **Authorization:**  
 Required (Bearer Token)
@@ -112,19 +115,19 @@ Required (Bearer Token)
 **Access:**
 Staff
 
-### Endpoint `DELETE api/products/{productId}`
+### Endpoint `PATCH api/products/{productId}`
 
 ### Path Variable
 
 | Parameter   | Type  | Description                     |
 | ----------- | ----- | ------------------------------- |
-| `productId` | `int` | The ID of the product to delete |
+| `productId` | `int` | The ID of the product to deactivate |
 
 ### Response body (Success):
 
 ```json
 {
-  "msg": "Success to delete product"
+  "msg": "Success to deactivate product"
 }
 ```
 
@@ -132,7 +135,7 @@ Staff
 
 ```json
 {
-  "msg": "Failed to delete product"
+  "msg": "Failed to deactivate product"
 }
 ```
 
