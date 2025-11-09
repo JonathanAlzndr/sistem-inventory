@@ -129,7 +129,7 @@ Cashier, Owner
 
 ---
 
-### Get Transaction Detail
+## Get Transaction Detail
 
 **Description:**  
 Get Detail of a Transaction
@@ -140,7 +140,7 @@ Required (Bearer Token)
 **Access:**
 Cashier
 
-### Endpoint: `GET api/transaction/{transactionId}
+### Endpoint: `GET api/transaction/{transactionId}`
 
 ### Path Variable
 | Parameter   | Type | Description |
@@ -203,8 +203,3 @@ Cashier
 {
   "msg": "You do not have permission to access this resource."
 }
-
-
-
-
-
