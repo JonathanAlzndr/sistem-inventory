@@ -18,13 +18,18 @@ def create_transaction():
     data = request.get_json()
     if not data or 'items' not in data or not isinstance(data['items'], list):
         return jsonify(msg="Invalid request: 'items' key (as a list) is required"), 400
+    customer_name = data.get('customerName','').strip()
+    
+    if not customer_name:
+        return jsonify(msg='Customer name is required'), 400
     
     items_list = data['items']
 
     try:
         receipt = create_new_transaction_service(
             items_list=items_list,
-            cashier_id=cashier_id
+            cashier_id=cashier_id,
+            customer_name=customer_name
         )
         
         return jsonify(receipt), 201

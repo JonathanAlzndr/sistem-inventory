@@ -1,8 +1,13 @@
 from utils.extensions import db
 from models import Product
+from utils.exceptions import ProductNotFound
 
-def get_all_product(limit: int = 10, offset: int = 0):
-    return Product.query.offset(offset=offset).limit(limit=limit)
+def get_all_product(limit: int = 10, offset: int = 0, include_unavailable: bool = False):
+    query = Product.query
+    if not include_unavailable:
+        query = query.filter_by(isAvailable=True)
+    return query.offset(offset).limit(limit).all()
+
 
 def create_new_product(data):
     try:
@@ -28,13 +33,14 @@ def create_new_product(data):
 def get_product_by_id(productId):
     return Product.query.get(productId)
 
-def delete_product(productId):
+def deactivate_product(productId):
     product = Product.query.get(productId)
 
     if not product:
-        return False
+        raise ProductNotFound(f"Product with id {productId} not found") 
     
-    db.session.delete(product)
+    if not product.isAvailable:
+        return False 
+    product.isAvailable = False
     db.session.commit()
-
     return True
