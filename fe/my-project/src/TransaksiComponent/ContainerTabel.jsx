@@ -2,7 +2,7 @@ import React from "react";
 import BttnEkspor from "../kecilComponent/bttnEkspor";
 import TabelTransaksi from "./TabelTransaksi";
 
-const ContainerTabel = () => {
+const ContainerTabel = ({refreshTrigger}) => {
   return (
     <>
       <div className="bg-white shadow h-[449px] w-[1225px] p-4 px-6 rounded-[10px]">
@@ -20,7 +20,7 @@ const ContainerTabel = () => {
           </div>
         </header>
         <main>
-          <TabelTransaksi />
+          <TabelTransaksi refreshTrigger={refreshTrigger} />
         </main>
       </div>
     </>

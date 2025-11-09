@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import GambarBeras from "../assets/gambar/beras.jpeg";
 
-const ListProduk = ({ cart, setCart }) => {
+const ListProduk = ({ cart, setCart,pilihStatus }) => {
   const [produkList, setProdukList] = useState([]);
 
   useEffect(() => {
@@ -12,10 +12,16 @@ const ListProduk = ({ cart, setCart }) => {
           alert("Token tidak ada, silakan login ulang");
           return;
         }
-        
-        const res = await fetch("http://127.0.0.1:5000/api/products/", {
-          method: 'GET',
-          credentials: 'include',
+let url = "http://127.0.0.1:5000/api/products/";
+
+        // Jika ada filter yang dipilih, tambahkan sebagai query parameter
+        // (Saya asumsikan API Anda menggunakan 'weight' untuk filter kg)
+        if (pilihStatus) {
+          url += `?weight=${pilihStatus}`;
+        }
+        const res = await fetch(url, {
+          method: "GET",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -47,29 +53,33 @@ const ListProduk = ({ cart, setCart }) => {
     };
 
     fetchProduk();
-  }, []);
+  }, [pilihStatus]);
 
   const handleAddToCart = (produk) => {
-    const existing = cart.find(item => item.productId === produk.productId || item.productId === produk.id);
+    const existing = cart.find(
+      (item) =>
+        item.productId === produk.productId || item.productId === produk.id
+    );
     if (existing) {
-      setCart(cart.map(item =>
-        (item.productId === produk.productId || item.productId === produk.id)
-          ? { ...item, jumlah: item.jumlah + 1 }
-          : item
-      ));
+      setCart(
+        cart.map((item) =>
+          item.productId === produk.productId || item.productId === produk.id
+            ? { ...item, jumlah: item.jumlah + 1 }
+            : item
+        )
+      );
     } else {
       setCart([
-  ...cart,
-  {
-    productId: produk.productId || produk.id,
-    nama: produk.productName,
-    harga: Number(produk.sellPrice),
-    jumlah: 1,
-    imgPath: produk.imgPath,    // tambahkan ini
-    kategori: produk.weight + " kg", // tambahkan ini
-  },
-]);
-
+        ...cart,
+        {
+          productId: produk.productId || produk.id,
+          nama: produk.productName,
+          harga: Number(produk.sellPrice),
+          jumlah: 1,
+          imgPath: produk.imgPath, // tambahkan ini
+          kategori: produk.weight + " kg", // tambahkan ini
+        },
+      ]);
     }
   };
 
@@ -78,7 +88,7 @@ const ListProduk = ({ cart, setCart }) => {
       {produkList.map((produk, index) => (
         <div
           key={produk.productId || index}
-          className="w-[141px] h-[165px] flex flex-col rounded-lg shadow bg-white"
+          className="w-[141px] h-[175px] flex flex-col rounded-lg shadow bg-white"
         >
           <div className="h-1/2 flex items-center justify-center">
             <img
@@ -88,16 +98,26 @@ const ListProduk = ({ cart, setCart }) => {
             />
           </div>
 
-          <div className="h-1/2 flex flex-col justify-between p-2 text-[8px]">
+          <div className="h-1/2 flex flex-col justify-between  p-2 text-[8px]">
             <div className="flex justify-between">
-              <section>
+              <section className="">
                 <p className="text-gray-700">Nama</p>
                 <p className="text-gray-700">Berat</p>
+                <p className="text-gray-700">Stok</p>
+
                 <p className="text-gray-700">Harga</p>
               </section>
-              <section className="text-right">
+              <section className="text-right ">
                 <p className="text-gray-700">{produk.productName}</p>
                 <p className="text-gray-700">{produk.weight} kg</p>
+                <p
+                  className="font-semibold "
+                
+                >
+                  {produk.currentStock < 1
+                    ? "Habis"
+                    : `${produk.currentStock} `}
+                </p>
                 <p className="text-gray-700">
                   Rp{Number(produk.sellPrice || 0).toLocaleString()}
                 </p>
@@ -105,9 +125,16 @@ const ListProduk = ({ cart, setCart }) => {
             </div>
             <button
               onClick={() => handleAddToCart(produk)}
-              className="mt-1 text-[8px] w-full p-1 rounded-[3px] bg-blue-400 hover:bg-blue-500 text-white"
+              disabled={produk.currentStock < 1}
+              className={`mt-1 text-[8px] w-full p-1 rounded-[3px] text-white ${
+                produk.currentStock < 1
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : produk.currentStock <= 5
+                  ? "bg-orange-400 hover:bg-orange-500"
+                  : "bg-green-400 hover:bg-green-500"
+              }`}
             >
-              Tambah Pesanan
+              {produk.currentStock < 1 ? "Habis" : "Tambah Pesanan"}
             </button>
           </div>
         </div>

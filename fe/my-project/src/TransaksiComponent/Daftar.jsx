@@ -1,41 +1,52 @@
-import React from "react";
+import React, { useState } from "react";
 import CardTransaksi from "./CardTransaksi";
-import { useState } from "react";
 import FormCatat from "./FormCatat";
 
-const Daftar = ({ cart, setCart }) => {
+const Daftar = ({ cart, setCart,refreshTrigger,setRefreshTrigger }) => {
   const [showForm, setShowForm] = useState(false);
+
+  // Hitung total harga dan total item
+  const totalHarga = cart.reduce(
+    (acc, item) => acc + (item.harga || 0) * (item.jumlah || 1),
+    0
+  );
+  const totalItem = cart.reduce((acc, item) => acc + (item.jumlah || 0), 0);
+
   return (
-    <div className="bg-white/80 w-[418px] rounded-[10px] shadow-md  flex flex-col justify-between p-4 py-2 ">
+    <div className="bg-white/80 w-[418px]  rounded-[10px] shadow-md flex flex-col justify-between p-4 py-2">
+      {/* Header */}
       <div>
-        <div>
-          <h2 className="text-lg font-semibold text-gray-700">
-            Daftar Pesanan
-          </h2>
-          <p className="text-gray-400 text-[13px]">Produk yang di pilih</p>
-        </div>
-        <div className="mt-3">
-          <CardTransaksi cart={cart} setCart={setCart} />
-        </div>
+        <h2 className="text-lg font-semibold text-gray-700">Daftar Pesanan</h2>
+        <p className="text-gray-400 text-[13px]">Produk yang di pilih</p>
       </div>
 
-      {/* total besanan & button */}
-      <div className="space-y-2">
-        <div className="text-[13px]  space-y-1 py-1 ">
+      {/* List Card */}
+      <div className="mt-3 flex-1">
+        <CardTransaksi cart={cart} setCart={setCart} />
+      </div>
+
+      {/* Total & tombol */}
+      <div className="space-y-2 mt-3">
+        <div className="text-[12px] ">
           <p>Total Pesanan:</p>
-          <p className="text-[15px] flex justify-between">
-            Rp.260.000.00 <span className="font-medium">3X</span>{" "}
+          <p className="text-[14px] font-semibold flex justify-between">
+            Rp{totalHarga.toLocaleString()}{" "}
+            <span className="font-medium">{totalItem}X</span>
           </p>
         </div>
-        <div className="flex flex-col gap-2 text-white">
+
+        <div className="flex flex-col gap-1 text-white">
           <button
             onClick={() => setShowForm(true)}
-            className="bg-green-400 hover:bg-green-500 p-1 rounded-[7px]"
+            className="bg-green-400 hover:bg-green-500 p-2 rounded-[7px]"
           >
             Catat
           </button>
-          <FormCatat isOpen={showForm} onClose={() => setShowForm(false)} />
-          <button className="bg-red-500  hover:bg-red-600 p-1  rounded-[7px]">
+          <FormCatat  cart={cart} isOpen={showForm} setRefreshTrigger={setRefreshTrigger}  refreshTrigger={refreshTrigger} onClose={() => setShowForm(false)} />
+          <button
+            onClick={() => setCart([])}
+            className="bg-red-500 hover:bg-red-600 p-2 rounded-[7px]"
+          >
             Batal Pilih Produk
           </button>
         </div>

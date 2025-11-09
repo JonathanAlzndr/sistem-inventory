@@ -10,6 +10,10 @@ from services.product_service import (
 from utils.decorators import roles_required
 from utils.exceptions import ProductNotFound, ValidationError
 from utils import file_extensions
+# Tambahkan dua baris ini di atas,
+# bersama import-an Anda yang lain
+from utils.extensions import db
+from models.product import Product
 
 product_bp = Blueprint('product', __name__, url_prefix='/api/products')
 
@@ -23,8 +27,15 @@ def get_image_url(filename):
 def get_all_products():
     limit = request.args.get('limit', 10, type=int)
     offset = request.args.get('offset', 0, type=int)
+    #tambah weight supaya bisa filter kg beras
+    weight_filter = request.args.get('weight', type=int)
 
-    products = get_all_product_service(limit, offset)
+    
+    products = get_all_product_service(
+        limit=limit, 
+        offset=offset, 
+        weight=weight_filter 
+    )
     
     result = [
         {
@@ -44,6 +55,29 @@ def get_all_products():
     ]
 
     return jsonify({"msg": "Success", "productList": result}), 200
+
+
+@product_bp.route('/weights/', methods=['GET'])
+@jwt_required()
+def get_unique_weights():
+    """
+    Endpoint ini mengambil semua nilai 'weight' yang unik 
+    dari tabel produk untuk mengisi dropdown filter.
+    """
+    try:
+        # 1. Query ke DB: Ambil 'weight' yang unik (distinct) dan urutkan
+        query_result = db.session.query(Product.weight).distinct().order_by(Product.weight)
+
+        # 2. Query_result akan terlihat seperti [(5,), (10,), (50,)]
+        #    Kita ubah menjadi list biasa: [5, 10, 50]
+        weights = [item[0] for item in query_result.all()]
+
+        # 3. Kirim sebagai JSON
+        return jsonify({"msg": "Success", "weights": weights}), 200
+
+    except Exception as e:
+        return jsonify(msg=f"Internal server error: {str(e)}"), 500
+
 
 
 @product_bp.route('/', methods=['POST'])

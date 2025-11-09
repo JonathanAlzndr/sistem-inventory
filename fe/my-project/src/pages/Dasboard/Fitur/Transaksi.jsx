@@ -6,6 +6,8 @@ import { useState } from "react";
 
 const Transaksi = () => {
     const [cart, setCart] = useState([]);
+      const [refreshTrigger, setRefreshTrigger] = useState(0);
+      const [pilihStatus, setPilihStatus] = useState("");
 
   return (
     <>
@@ -18,10 +20,11 @@ const Transaksi = () => {
         </div>
         <section className="flex gap-5 flex-col justify-center  items-center">
           <div className="flex gap-5">
-            <Pilih  cart={cart} setCart={setCart} />
-            <Daftar  cart={cart} setCart={setCart} />
+            <Pilih  cart={cart} setCart={setCart}  pilihStatus={pilihStatus} 
+              setPilihStatus={setPilihStatus}  />
+            <Daftar  cart={cart} setCart={setCart} setRefreshTrigger={setRefreshTrigger} />
           </div>
-          <ContainerTabel />
+          <ContainerTabel refreshTrigger={refreshTrigger}/>
         </section>
       </div>
     </>

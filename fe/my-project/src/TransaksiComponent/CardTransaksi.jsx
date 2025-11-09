@@ -56,7 +56,7 @@ const CardTransaksi = ({ cart, setCart }) => {
             <div className="flex justify-between items-center mt-1">
               <button
                 onClick={() => removeItem(produk.productId || produk.id)}
-                className="border border-gray-400 rounded px-2 py-[2px] text-gray-600 hover:bg-gray-100 transition"
+                className="border rounded px-2 py-[2px] text-gray-600 hover:scale-95 bg-red-500 text-white transition"
               >
                 Batal
               </button>
@@ -64,7 +64,7 @@ const CardTransaksi = ({ cart, setCart }) => {
               <div className="flex items-center gap-2 text-gray-700">
                 <button
                   onClick={() => updateQty(produk.productId || produk.id, produk.jumlah - 1)}
-                  className="hover:border rounded w-5 h-5 flex items-center justify-center hover:bg-gray-100"
+                  className="hover:border-2 rounded w-5 h-5 flex items-center justify-center hover:bg-gray-100"
                 >
                   –
                 </button>
