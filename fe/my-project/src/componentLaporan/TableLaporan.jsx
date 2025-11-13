@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { useCallback } from "react";
 
 const TABLE_HEAD = [
   "Nama Beras",
@@ -13,13 +16,18 @@ const getStatusByStock = (stock) => {
   if (stock <= 0) {
     return "Habis";
   }
-  if (stock <= 10) { // Anda bisa ubah angka 5 ini jika perlu
+  if (stock <= 10) {
+    // Anda bisa ubah angka 5 ini jika perlu
     return "Menipis";
   }
   return "Aman";
 };
 
-export default function TableLaporan({ pilihStatus, CariProduk }) {
+export default function TableLaporan({
+  pilihStatus,
+  CariProduk,
+  setExportHandler,
+}) {
   const [produkList, setProdukList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -57,7 +65,7 @@ export default function TableLaporan({ pilihStatus, CariProduk }) {
           tanggalMasuk: new Date(p.receivedDate).toLocaleDateString("id-ID"),
           kategori: `${p.weight} kg`,
           Stok: p.currentStock,
-         
+
           // Status sekarang dihitung berdasarkan stok
           status: getStatusByStock(p.currentStock),
         }));
@@ -76,12 +84,15 @@ export default function TableLaporan({ pilihStatus, CariProduk }) {
 
   const FilterData = produkList.filter((item) => {
     const namaProduk = item.nama || "";
-    
+
     // Pastikan 'pilihStatus' ada sebelum di-toLowerCase()
     const statusFilter = pilihStatus || "Semua";
-    
-    const cocokStatus = statusFilter === "Semua" || item.status === statusFilter;
-    const cocokNama = namaProduk.toLowerCase().includes(CariProduk.toLowerCase());
+
+    const cocokStatus =
+      statusFilter === "Semua" || item.status === statusFilter;
+    const cocokNama = namaProduk
+      .toLowerCase()
+      .includes(CariProduk.toLowerCase());
     return cocokStatus && cocokNama;
   });
 
@@ -97,6 +108,73 @@ export default function TableLaporan({ pilihStatus, CariProduk }) {
         return "bg-gray-100 text-gray-700";
     }
   };
+
+  const handleExport = useCallback(() => {
+    if (produkList.length === 0) {
+      alert("Tidak ada data transaksi untuk diekspor!");
+      return;
+    }
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const today = new Date().toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("CR.JAYA", pageWidth / 2, 20, { align: "center" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(14);
+    doc.text("Laporan Data Total stok Di Gudang", pageWidth / 2, 30, { align: "center" });
+    doc.setFontSize(10);
+    doc.text(`Tanggal Cetak: ${today}`, 14, 40);
+    doc.setDrawColor(180, 180, 180);
+    doc.line(14, 45, pageWidth - 14, 45);
+
+    const tableHeaders = [
+      "Nama Beras",
+      "Tanggal Masuk",
+      "Kategori",
+      "Stok saat ini",
+      "Status",
+    ];
+
+    const tableBody = produkList.map((p) => [
+      p.nama,
+      p.tanggalMasuk,
+      p.kategori,
+      p.Stok,
+      p.status,
+    ]);
+
+    autoTable(doc, {
+      startY: 50,
+      head: [tableHeaders],
+      body: tableBody,
+      theme: "grid",
+      didDrawPage: (data) => {
+        const pageCount = doc.internal.getNumberOfPages();
+        doc.setFontSize(10);
+        doc.text(
+          `Halaman ${data.pageNumber} dari ${pageCount}`,
+          pageWidth / 2,
+          pageHeight - 10,
+          { align: "center" }
+        );
+      },
+    });
+
+    doc.save("Laporan-TotalStok-CRJAYA.pdf");
+  }, [produkList]);
+
+  // --- 4. useEffect UNTUK REGISTRASI DIPINDAHKAN KELUAR ---
+  useEffect(() => {
+    setExportHandler(() => handleExport);
+  }, [handleExport, setExportHandler]);
 
   if (loading) {
     return (
@@ -130,21 +208,22 @@ export default function TableLaporan({ pilihStatus, CariProduk }) {
           </tr>
         </thead>
         <tbody
-          key={pilihStatus} 
+          key={pilihStatus}
           className=" overflow-y-scroll duration-500 ease-in-out animate-fadeIn transition-all max-h-[450px] "
         >
           {FilterData.length === 0 ? (
             <tr>
-              <td colSpan={TABLE_HEAD.length} className="text-center p-4 text-gray-500">
+              <td
+                colSpan={TABLE_HEAD.length}
+                className="text-center p-4 text-gray-500"
+              >
                 Tidak ada data yang ditemukan.
               </td>
             </tr>
           ) : (
             FilterData.map((row, index) => {
               const isLast = index === FilterData.length - 1;
-              const rowClass = isLast
-                ? "p-4 "
-                : "p-4 border-b border-gray-200";
+              const rowClass = isLast ? "p-4 " : "p-4 border-b border-gray-200";
 
               return (
                 <tr key={index} className="px-1 hover:bg-gray-50 ">

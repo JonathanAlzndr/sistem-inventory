@@ -6,8 +6,7 @@ import {
   MdOutlineKeyboardArrowUp,
 } from "react-icons/md";
 
-const InputProduk = ({ editData, setProdukList }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const InputProduk = ({ editData, setProdukList, isOpen, setIsOpen,setEditData }) => {
   const [formData, setFormData] = useState({
     productName: "",
     receivedDate: "",
@@ -47,7 +46,7 @@ const InputProduk = ({ editData, setProdukList }) => {
       setFormData({
         ...formData,
         imgPreview: preview,
-        imgPath: file.name, // backend hanya butuh nama file
+        imgPath: file.name,
       });
     } else {
       setFormData({ ...formData, [name]: value });
@@ -58,7 +57,7 @@ const InputProduk = ({ editData, setProdukList }) => {
     setFormData({ ...formData, imgPreview: null, imgPath: "image.jpg" });
   };
 
-  const handleReset = () => {
+   const handleReset = () => {
     setFormData({
       productName: "",
       receivedDate: "",
@@ -194,6 +193,7 @@ const InputProduk = ({ editData, setProdukList }) => {
               </label>
               <input
                 type="number"
+                min="0"
                 name="sellPrice"
                 value={formData.sellPrice}
                 onChange={handleChange}
@@ -227,6 +227,7 @@ const InputProduk = ({ editData, setProdukList }) => {
               </label>
               <input
                 type="number"
+                min="0"
                 name="purchasePrice"
                 value={formData.purchasePrice}
                 onChange={handleChange}
@@ -241,6 +242,7 @@ const InputProduk = ({ editData, setProdukList }) => {
               </label>
               <input
                 type="number"
+                min="0"
                 name="currentStock"
                 value={formData.currentStock}
                 onChange={handleChange}
@@ -295,9 +297,8 @@ const InputProduk = ({ editData, setProdukList }) => {
               onClick={() => {
                 handleReset();
                 setIsOpen(false);
-                
+                 setEditData(null);
               }}
-              
               className="bg-red-500 text-white rounded-md hover:bg-red-600 transition w-full mt-2"
             >
               Batal

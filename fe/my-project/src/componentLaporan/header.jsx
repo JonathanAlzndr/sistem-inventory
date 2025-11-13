@@ -2,7 +2,8 @@ import React from "react";
 import { IoIosSearch } from "react-icons/io";
 import BttnEkspor from "../kecilComponent/bttnEkspor";
 
-const header = ({ pilihStatus, setPilihStatus, CariProduk, setCariProduk }) => {
+const header = ({ pilihStatus, setPilihStatus, CariProduk, setCariProduk,exportHandler }) => {
+  
   return (
     <>
       <div className="w-full flex gap-9 text-[14px]">
@@ -27,7 +28,14 @@ const header = ({ pilihStatus, setPilihStatus, CariProduk, setCariProduk }) => {
             <option value="Menipis">Menipis</option>
             <option value="Habis">Habis</option>
           </select>
-          <BttnEkspor />
+          <BttnEkspor
+          onClick={() => {
+                if (exportHandler) {
+                  exportHandler(); // Jalankan fungsi jika ada
+                } else {
+                  alert("Data belum siap atau tidak ada.");
+                }
+              }}  />
         </div>
       </div>
     </>

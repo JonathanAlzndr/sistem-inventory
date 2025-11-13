@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useCallback } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import DetailPesanan from "./DetailPesanan";
-// Pastikan nama file modal konfirmasi Anda benar
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import DeleteKonfirmasi from "./DeleteKonfirmasi"; 
 
-const TableTransaksi = ({ refreshTrigger }) => {
+const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
   const [transactionList, setTransactionList] = useState([]);
   const [showDetail, setShowDetail] = useState(false);
   const [selectedTransactionId, setSelectedTransactionId] = useState(null);
@@ -48,6 +50,7 @@ const TableTransaksi = ({ refreshTrigger }) => {
   };
 
   const executeDelete = async (password) => {
+    
     if (!password) {
       alert("Password tidak boleh kosong!");
       return;
@@ -91,6 +94,79 @@ const TableTransaksi = ({ refreshTrigger }) => {
     setShowDeleteModal(false);
     setIdToDelete(null);
   };
+
+  // --- 3. FUNGSI HANDLEEXPORT DIPINDAHKAN KELUAR ---
+  const handleExport = useCallback(() => {
+    if (transactionList.length === 0) {
+      alert("Tidak ada data transaksi untuk diekspor!");
+      return;
+    }
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const today = new Date().toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("CR.JAYA", pageWidth / 2, 20, { align: "center" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(14);
+    doc.text("Laporan Data Transaksi", pageWidth / 2, 30, { align: "center" });
+    doc.setFontSize(10);
+    doc.text(`Tanggal Cetak: ${today}`, 14, 40);
+    doc.setDrawColor(180, 180, 180);
+    doc.line(14, 45, pageWidth - 14, 45);
+
+    const tableHeaders = [
+      "ID Transaksi",
+      "Nama Pemesan",
+      "Tanggal",
+      "Waktu",
+      "Total Item",
+      "Total Harga",
+    ];
+
+    const tableBody = transactionList.map((trx) => [
+      `T-${trx.transactionId}`,
+      trx.customerName || "-",
+      new Date(trx.transactionDate).toLocaleDateString("id-ID"),
+      new Date(trx.transactionDate).toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      trx.totalItems,
+      `Rp.${Number(trx.totalPrice).toLocaleString("id-ID")}`,
+    ]);
+
+    autoTable(doc, {
+      startY: 50,
+      head: [tableHeaders],
+      body: tableBody,
+      theme: "grid",
+      didDrawPage: (data) => {
+        const pageCount = doc.internal.getNumberOfPages();
+        doc.setFontSize(10);
+        doc.text(
+          `Halaman ${data.pageNumber} dari ${pageCount}`,
+          pageWidth / 2,
+          pageHeight - 10,
+          { align: "center" }
+        );
+      },
+    });
+
+    doc.save("Laporan-Transaksi-CRJAYA.pdf");
+  }, [transactionList]);
+
+  // --- 4. useEffect UNTUK REGISTRASI DIPINDAHKAN KELUAR ---
+  useEffect(() => {
+    setExportHandler(() => handleExport);
+  }, [handleExport, setExportHandler]);
 
   return (
     <div className="w-full overflow-x-auto mt-3">

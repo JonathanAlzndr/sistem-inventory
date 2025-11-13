@@ -1,8 +1,10 @@
+import { useState } from "react";
 import React from "react";
 import BttnEkspor from "../kecilComponent/bttnEkspor";
 import TabelTransaksi from "./TabelTransaksi";
 
 const ContainerTabel = ({refreshTrigger}) => {
+  const [exportHandler, setExportHandler] = useState(null);
   return (
     <>
       <div className="bg-white shadow h-[449px] w-[1225px] p-4 px-6 rounded-[10px]">
@@ -16,11 +18,19 @@ const ContainerTabel = ({refreshTrigger}) => {
             </p>
           </div>
           <div className="flex flex-col justify-center">
-            <BttnEkspor />
+            <BttnEkspor
+            onClick={() => {
+                if (exportHandler) {
+                  exportHandler(); // Jalankan fungsi jika ada
+                } else {
+                  alert("Data belum siap atau tidak ada.");
+                }
+              }} />
           </div>
         </header>
         <main>
-          <TabelTransaksi refreshTrigger={refreshTrigger} />
+          <TabelTransaksi refreshTrigger={refreshTrigger}
+          setExportHandler={setExportHandler} />
         </main>
       </div>
     </>

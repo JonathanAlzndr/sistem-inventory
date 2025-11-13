@@ -7,6 +7,7 @@ import { useState,useEffect } from "react";
 const Produk = () => {
   const [editData, setEditData] = useState(null);
   const [produkList, setProdukList] = useState([]);
+   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const fetchProduk = async () => {
@@ -33,12 +34,16 @@ const Produk = () => {
         </p>
 
         <InputProduk
+        isOpen={isOpen}
+         setIsOpen={setIsOpen}
           editData={editData}
           setEditData={setEditData}
           produkList={produkList}
           setProdukList={setProdukList}
         />
         <ProdukTabel
+        setIsOpen={setIsOpen}
+        isOpen={isOpen}
           produkList={produkList}
           setProdukList={setProdukList}
           setEditData={setEditData}

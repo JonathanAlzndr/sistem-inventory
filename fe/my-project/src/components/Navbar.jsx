@@ -6,7 +6,7 @@ export default function Navbar({ title, subtitle }) {
   // Ambil role dari localStorage
   const role = localStorage.getItem("role");
 
-  // Fungsi untuk menampilkan nama role yang lebih rapi
+  // Fungsi untuk menampilkan nama role 
   const getRoleName = () => {
     if (role === "Owner") return "Pemilik";
     if (role === "Cashier") return "Kasir";

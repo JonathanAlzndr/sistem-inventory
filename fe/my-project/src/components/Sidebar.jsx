@@ -1,25 +1,24 @@
 import React from "react";
 // NavLink untuk navigasi, useNavigate untuk aksi logout
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { FaFileAlt } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
 import { MdOutlineWarehouse } from "react-icons/md";
-import { BiSolidLogOut } from "react-icons/bi";
+
 import { FaBoxOpen, FaCashRegister } from "react-icons/fa";
+import KonfirLogut from "./KonfirLogut";
 
 // ======================================================
 // PUSAT KONTROL NAVIGASI
 // ======================================================
 
 const ALL_NAV_LINKS = {
-
   dasbor: {
     name: "Dasbor",
-    path: "/dasbor", 
+    path: "/dasbor",
     icon: <MdDashboard />,
     end: true,
   },
-
 
   laporan: {
     name: "Laporan",
@@ -41,7 +40,6 @@ const ALL_NAV_LINKS = {
   },
 };
 
-
 // Peta ini hanya memilih link mana yang mau ditampilkan
 const ROLE_NAV_MAP = {
   Owner: [ALL_NAV_LINKS.dasbor, ALL_NAV_LINKS.laporan],
@@ -51,27 +49,18 @@ const ROLE_NAV_MAP = {
 };
 
 export default function Sidebar() {
-  const navigate = useNavigate();
+ 
   const role = localStorage.getItem("role");
 
- 
   const navItemsToShow = ROLE_NAV_MAP[role] || ROLE_NAV_MAP.default;
-
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    navigate("/RoleLogin");
-  };
 
   const getNavLinkClass = ({ isActive }) => {
     return `flex items-center gap-3 px-6 py-3 hover:bg-gray-100 ${
-      isActive ? "bg-green-500 text-white" : "" // 
+      isActive ? "bg-green-500 text-white" : "" //
     }`;
   };
 
   return (
-  
     <div className="w-[200px] bg-white text-black h-screen flex flex-col">
       {/* Logo */}
       <div className="h-20 flex gap-3   items-center justify-center text-2xl font-bold border-b  border-gray-300">
@@ -82,7 +71,9 @@ export default function Sidebar() {
           <h1 className="text-[22px] font-bold text-gray-800 leading-none ">
             CR.JAYA
           </h1>
-          <p className="text-[11px] font-medium   text-gray-500">Sistem Inventaris</p>
+          <p className="text-[11px] font-medium   text-gray-500">
+            Sistem Pencatatan
+          </p>
         </div>
       </div>
 
@@ -102,15 +93,8 @@ export default function Sidebar() {
         ))}
 
         {/* "Keluar" sebagai <button> */}
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-6 py-3 hover:bg-gray-100 w-full text-left"
-        >
-          <BiSolidLogOut />
-          <span>Keluar</span>
-        </button>
+        <KonfirLogut  />
       </nav>
     </div>
   );
 }
-

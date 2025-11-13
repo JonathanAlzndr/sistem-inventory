@@ -4,18 +4,20 @@ import gambar from "../../assets/gambar/dasbor.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { MdKeyboardArrowLeft } from "react-icons/md";
+import Loading from "../../kecilComponent/Loading";
 
 export default function Login() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  function KembaliRole(){
-    navigate("/RoleLogin")
+  function KembaliRole() {
+    navigate("/RoleLogin");
   }
 
   const handleSubmit = async (e) => {
@@ -28,22 +30,24 @@ export default function Login() {
         body: JSON.stringify(formData),
       });
 
-
       const data = await res.json();
       const selectedRole = localStorage.getItem("role");
 
       // Validasi: cek apakah role akun sesuai dengan role yang dipilih
-      if (selectedRole !== data.user_role && !res.ok ) {
-        alert("Username atau Password tidak Sesuai")
+      if (selectedRole !== data.user_role && !res.ok) {
+        alert("Username atau Password tidak Sesuai");
         return;
       }
-      alert("login berhasil");
+      setIsLoading(true);
+      setTimeout(() => {
+      
 
-      localStorage.setItem("token", data.token);
+        localStorage.setItem("token", data.token);
 
-      localStorage.setItem("role", data.user_role);
+        localStorage.setItem("role", data.user_role);
 
-      navigate("/dasbor");
+        navigate("/dasbor");
+      }, 500);
     } catch (err) {
       console.error(err);
       alert("Terjadi kesalahan server!");
@@ -52,11 +56,12 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">
-      
       <div className="w-[900px] h-[500px] flex shadow-lg rounded-[10px]">
-       < MdKeyboardArrowLeft  
-       onClick={KembaliRole}
-       className="fixed top-30 left-84 text-[30px] text-gray-700 hover:scale-110 duration-150 hover:border-2 rounded-full"/>
+        <Loading isLoading={isLoading} />
+        <MdKeyboardArrowLeft
+          onClick={KembaliRole}
+          className="fixed top-30 left-84 text-[30px] text-gray-700 hover:scale-110 duration-150 hover:border-2 rounded-full"
+        />
         <div className="w-[450px] h-full p-10 py-23">
           <h2 className="text-2xl font-bold text-center mb-6">Masuk</h2>
           <form

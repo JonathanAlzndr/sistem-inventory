@@ -1,16 +1,100 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import BttnEkspor from "../kecilComponent/bttnEkspor";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { CgAddR } from "react-icons/cg";
 
 export default function ProdukTabel({
   setEditData,
   setProdukList,
   produkList,
+  setIsOpen,
 }) {
   const [loading, setLoading] = useState(true);
 
   const handleExport = () => {
-    alert("Fitur ekspor data ");
+    if (produkList.length === 0) {
+      alert("Tidak ada data untuk diekspor!");
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    // --- 1. MEMBUAT HEADER PERUSAHAAN ---
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight(); // (Opsional, untuk footer)
+    const today = new Date().toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+
+    // Judul Perusahaan (Besar dan di Tengah)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("CR.JAYA", pageWidth / 2, 20, { align: "center" });
+
+    // Judul Laporan (Lebih kecil, di bawahnya)
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(14);
+    doc.text("Laporan Data Produk", pageWidth / 2, 30, { align: "center" });
+
+    // Tanggal Cetak (Kecil, di kiri)
+    doc.setFontSize(10);
+    doc.text(`Tanggal Cetak: ${today}`, 14, 40); // 14 adalah margin kiri
+
+    // Garis Pemisah
+    doc.setDrawColor(180, 180, 180); // Warna garis abu-abu
+    doc.line(14, 45, pageWidth - 14, 45); // Garis dari margin kiri ke kanan
+
+    // --- 2. MEMBUAT TABEL (Sama seperti sebelumnya) ---
+
+    const tableHeaders = [
+      "Nama Produk",
+      "Berat (kg)",
+      "Stok",
+      "Harga Jual",
+      "Harga Beli",
+      "Tgl. Masuk",
+    ];
+
+    const tableBody = produkList.map((p) => [
+      p.productName,
+      p.weight,
+      p.currentStock,
+      `Rp${Number(p.sellPrice || 0).toLocaleString("id-ID")}`,
+      `Rp${Number(p.purchasePrice || 0).toLocaleString("id-ID")}`,
+      p.receivedDate
+        ? new Date(p.receivedDate).toLocaleDateString("id-ID")
+        : "-",
+    ]);
+
+    // Gunakan 'autoTable' sebagai fungsi
+    autoTable(doc, {
+      startY: 50, // <-- PENTING: Mulai tabel di bawah header (Y=50)
+      head: [tableHeaders],
+      body: tableBody,
+      theme: "grid",
+
+      // --- 3. (OPSIONAL) MEMBUAT FOOTER/NOMOR HALAMAN ---
+      // Ini akan otomatis menambahkan footer di SETIAP halaman
+      didDrawPage: (data) => {
+        // Footer
+        const pageCount = doc.internal.getNumberOfPages();
+        doc.setFontSize(10);
+        doc.text(
+          `Halaman ${data.pageNumber} dari ${pageCount}`,
+          pageWidth / 2,
+          pageHeight - 10, // Posisi 10mm dari bawah
+          { align: "center" }
+        );
+      },
+    });
+
+    // --- 4. SIMPAN FILE ---
+    doc.save("Laporan-Produk-CRJAYA.pdf");
   };
 
   // Ambil data produk saat pertama kali load
@@ -56,7 +140,7 @@ export default function ProdukTabel({
 
   useEffect(() => {
     fetchProduk();
-  }, []); //  hanya dijalankan sekali
+  }); //  hanya dijalankan sekali
 
   //  Hapus produk langsung dari list
   const handleDelete = async (id) => {
@@ -101,7 +185,18 @@ export default function ProdukTabel({
       {/* Header atas */}
       <div className="flex justify-between items-center mb-5">
         <h2 className="text-lg font-semibold text-gray-700">Daftar Produk</h2>
-        <BttnEkspor onClick={handleExport} />
+        <div className="flex gap-3">
+          <button
+            onClick={() => {
+              setEditData(null); // 🔹 keluar dari mode edit
+              setIsOpen(true);
+            }}
+            className="hover:scale-102 duration-95 p-1 border rounded-[7px] bg-green-500 border-gray-300 text-white text-[13px] w-[140px] gap-2 flex items-center justify-center"
+          >
+            Tambah Produk <CgAddR className="text-[14px]" />
+          </button>
+          <BttnEkspor onClick={handleExport} />
+        </div>
       </div>
 
       {/* Tabel produk */}
@@ -154,7 +249,7 @@ export default function ProdukTabel({
                         : "text-green-600"
                     }`}
                   >
-                    {item.currentStock}
+                    {item.currentStock == 0 ? "Habis" : item.currentStock}
                   </td>
                   <td className="p-3 text-gray-600">
                     {item.receivedDate
