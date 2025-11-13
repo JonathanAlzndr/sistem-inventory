@@ -15,13 +15,13 @@ const InputProduk = ({ editData, setProdukList }) => {
     currentStock: "",
     sellPrice: "",
     purchasePrice: "",
-    imgFile: null,
+    imgPath: "image.jpg", // default sesuai dokumentasi
     imgPreview: null,
   });
 
   useEffect(() => {
     if (editData) {
-      setIsOpen(true); // buka form otomatis
+      setIsOpen(true);
       setFormData({
         productName: editData.productName || "",
         receivedDate: editData.receivedDate
@@ -31,32 +31,33 @@ const InputProduk = ({ editData, setProdukList }) => {
         currentStock: editData.currentStock || "",
         sellPrice: editData.sellPrice || "",
         purchasePrice: editData.purchasePrice || "",
-        imgFile: null,
-        imgPreview: editData.imgPath || null, // tampilkan gambar lama
+        imgPath: editData.imgPath || "image.jpg",
+        imgPreview: editData.imgPath || null,
       });
     }
   }, [editData]);
 
-  
-
-  // Update state untuk input
+  // handle input biasa dan gambar (hanya preview)
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files && files[0]) {
       const file = files[0];
       const preview = URL.createObjectURL(file);
-      setFormData({ ...formData, imgFile: file, imgPreview: preview });
+      // hanya tampilkan preview, tidak dikirim ke backend
+      setFormData({
+        ...formData,
+        imgPreview: preview,
+        imgPath: file.name, // backend hanya butuh nama file
+      });
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
 
-  // Hapus gambar
   const handleRemoveImage = () => {
-    setFormData({ ...formData, imgFile: null, imgPreview: null });
+    setFormData({ ...formData, imgPreview: null, imgPath: "image.jpg" });
   };
 
-  // Reset form
   const handleReset = () => {
     setFormData({
       productName: "",
@@ -65,12 +66,11 @@ const InputProduk = ({ editData, setProdukList }) => {
       currentStock: "",
       sellPrice: "",
       purchasePrice: "",
-      imgFile: null,
+      imgPath: "image.jpg",
       imgPreview: null,
     });
   };
 
-  // Submit form ke backend
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -87,47 +87,39 @@ const InputProduk = ({ editData, setProdukList }) => {
 
     try {
       const token = localStorage.getItem("token");
-      const isEdit = !!editData; // true kalau lagi edit
+      const isEdit = !!editData;
+
+      const payload = {
+        productName: formData.productName,
+        receivedDate: new Date(formData.receivedDate).toISOString(),
+        weight: parseFloat(formData.weight),
+        currentStock: parseInt(formData.currentStock),
+        sellPrice: parseFloat(formData.sellPrice),
+        purchasePrice: parseFloat(formData.purchasePrice),
+        imgPath: formData.imgPath || "image.jpg",
+      };
 
       let res;
       if (isEdit) {
-        // === UPDATE PRODUK ===
-        const url = `http://127.0.0.1:5000/api/products/${editData.productId}`;
-        res = await fetch(url, {
-          method: "PATCH",
+        res = await fetch(
+          `http://127.0.0.1:5000/api/products/${editData.productId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          }
+        );
+      } else {
+        res = await fetch("http://127.0.0.1:5000/api/products", {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            productName: formData.productName,
-            receivedDate: new Date(formData.receivedDate).toISOString(),
-            weight: parseFloat(formData.weight),
-            currentStock: parseInt(formData.currentStock),
-            sellPrice: parseFloat(formData.sellPrice),
-            purchasePrice: parseFloat(formData.purchasePrice),
-            imgPath: editData.imgPath, // pakai gambar lama
-          }),
-        });
-      } else {
-        // === TAMBAH PRODUK BARU ===
-        const form = new FormData();
-        form.append("productName", formData.productName);
-        form.append(
-          "receivedDate",
-          new Date(formData.receivedDate).toISOString()
-        );
-        form.append("weight", parseFloat(formData.weight));
-        form.append("currentStock", parseInt(formData.currentStock));
-        form.append("sellPrice", parseFloat(formData.sellPrice));
-        form.append("purchasePrice", parseFloat(formData.purchasePrice));
-        if (formData.imgFile) form.append("imgPath", formData.imgFile);
-        else return alert("Silakan isi gambar produk!");
-
-        res = await fetch("http://127.0.0.1:5000/api/products/", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-          body: form,
+          body: JSON.stringify(payload),
         });
       }
 
@@ -136,17 +128,15 @@ const InputProduk = ({ editData, setProdukList }) => {
       if (res.ok) {
         alert(isEdit ? "Produk berhasil diubah!" : "Produk berhasil dibuat!");
 
-        // Update state list produk biar tabel auto-update
+        // update tabel frontend
         if (isEdit) {
           setProdukList((prev) =>
             prev.map((p) =>
-              p.productId === editData.productId
-                ? { ...p, ...data.product } // ⬅️ gabung field lama + baru
-                : p
+              p.productId === editData.productId ? { ...p, ...payload } : p
             )
           );
         } else {
-          setProdukList((prev) => [...prev, data.product]);
+          setProdukList((prev) => [...prev, payload]);
         }
 
         handleReset();
@@ -162,20 +152,18 @@ const InputProduk = ({ editData, setProdukList }) => {
 
   return (
     <div className="flex flex-col justify-center items-center bg-white p-3 rounded-[10px] shadow-md w-full">
-      {/* Tombol utama */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex gap-2 justify-center items-center text-gray-700 font-medium"
       >
         {editData ? "Edit Produk" : "Tambah Produk"}{" "}
         {isOpen ? (
-          <MdOutlineKeyboardArrowUp className="text-2xl transition-transform duration-300" />
+          <MdOutlineKeyboardArrowUp className="text-2xl" />
         ) : (
-          <MdOutlineKeyboardArrowDown className="text-2xl transition-transform duration-300" />
+          <MdOutlineKeyboardArrowDown className="text-2xl" />
         )}
       </button>
 
-      {/* Bagian dropdown input */}
       <div
         className={`overflow-hidden transition-all duration-500 ease-in-out ${
           isOpen ? "max-h-[600px] opacity-100 mt-4" : "max-h-0 opacity-0"
@@ -185,7 +173,6 @@ const InputProduk = ({ editData, setProdukList }) => {
           onSubmit={handleSubmit}
           className="gap-3 p-3 border-t space-y-5 border-gray-200"
         >
-          {/* Baris 1 */}
           <div className="grid grid-cols-3 gap-8">
             <div className="flex flex-col">
               <label className="text-sm font-medium text-gray-600 mb-1">
@@ -229,7 +216,6 @@ const InputProduk = ({ editData, setProdukList }) => {
             </div>
           </div>
 
-          {/* Baris 2 */}
           <div className="grid grid-cols-3 gap-8">
             <div className="flex flex-col">
               <InputKategori value={formData.weight} onChange={handleChange} />
@@ -264,7 +250,6 @@ const InputProduk = ({ editData, setProdukList }) => {
             </div>
           </div>
 
-          {/* Upload Gambar + Preview */}
           <div className="flex flex-col gap-3">
             <label className="text-sm font-medium text-gray-600 mb-1">
               Gambar Produk
@@ -304,15 +289,15 @@ const InputProduk = ({ editData, setProdukList }) => {
             </label>
           </div>
 
-          {/* Tombol Batal / Simpan */}
           <div className="flex h-[45px] gap-4 w-full mt-5">
             <button
               type="button"
               onClick={() => {
-                handleReset(); // reset semua input
-       
-                setIsOpen(false); // tutup form ke mode tambah
+                handleReset();
+                setIsOpen(false);
+                
               }}
+              
               className="bg-red-500 text-white rounded-md hover:bg-red-600 transition w-full mt-2"
             >
               Batal

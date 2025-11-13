@@ -135,7 +135,7 @@ def get_product_by_id(productId):
     else:
         return jsonify({"msg": "Product not found"}), 404
 
-@product_bp.route('/<int:productId>', methods=['PATCH'])
+@product_bp.route('/<int:productId>/deactivate', methods=['PATCH'])
 @jwt_required()
 @roles_required('Staff')
 def deactivate_product(productId):

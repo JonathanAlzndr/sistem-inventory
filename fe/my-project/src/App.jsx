@@ -32,7 +32,7 @@ function App() {
         <Route path="/owner" element={<OwnerDashboard />} />
 
         {/* --- DILENGKAPI --- */}
-        {/* 5. Daftarkan rute lain dari sidebar di sini */}
+
         <Route path="/Dasbor" element={<Dasbor />} />
         <Route path="/laporan" element={<Laporan />} />
         <Route path="/produk" element={<Produk />} />
