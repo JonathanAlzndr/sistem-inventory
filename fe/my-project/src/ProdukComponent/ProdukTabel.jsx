@@ -4,6 +4,10 @@ import BttnEkspor from "../kecilComponent/bttnEkspor";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { CgAddR } from "react-icons/cg";
+import { toast } from "react-toastify";
+import Loading from "../kecilComponent/Loading";
+import KonfirmasiModal from "../kecilComponent/InfoKonfirmasi";
+
 
 export default function ProdukTabel({
   setEditData,
@@ -11,11 +15,14 @@ export default function ProdukTabel({
   produkList,
   setIsOpen,
 }) {
+  const [isActionLoading, setIsActionLoading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [idToDelete, setIdToDelete] = useState(null);
 
   const handleExport = () => {
     if (produkList.length === 0) {
-      alert("Tidak ada data untuk diekspor!");
+      toast.info("Tidak ada data untuk diekspor!");
       return;
     }
 
@@ -95,6 +102,7 @@ export default function ProdukTabel({
 
     // --- 4. SIMPAN FILE ---
     doc.save("Laporan-Produk-CRJAYA.pdf");
+    toast.success("Data berhasil diekspor!");
   };
 
   // Ambil data produk saat pertama kali load
@@ -119,7 +127,7 @@ export default function ProdukTabel({
 
       if (!res.ok) {
         if (res.status === 401) {
-          alert("Sesi Anda berakhir, silakan login ulang.");
+          toast.info("Sesi Anda berakhir, silakan login ulang.");
           localStorage.removeItem("token");
           window.location.href = "/";
           return;
@@ -132,7 +140,7 @@ export default function ProdukTabel({
       setProdukList(data.productList || []);
     } catch (err) {
       console.error("Fetch error:", err);
-      alert("Terjadi kesalahan saat mengambil data produk");
+      toast.error("Terjadi kesalahan saat mengambil data produk");
     } finally {
       setLoading(false);
     }
@@ -140,38 +148,48 @@ export default function ProdukTabel({
 
   useEffect(() => {
     fetchProduk();
-  }); //  hanya dijalankan sekali
+  }, []); //  hanya dijalankan sekali
 
   //  Hapus produk langsung dari list
-  const handleDelete = async (id) => {
-    if (!confirm("Yakin ingin menghapus produk ini?")) return;
+ 
+  const executeDelete = async () => {
+    // Tutup modal dan mulai loading
+    setShowDeleteModal(false);
+    setIsActionLoading(true);
+    const minDelay = new Promise((resolve) => setTimeout(resolve, 500));
 
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `http://127.0.0.1:5000/api/products/${id}/deactivate`,
+        // Gunakan 'idToDelete' dari state
+        `http://127.0.0.1:5000/api/products/${idToDelete}/deactivate`,
         {
           method: "PATCH",
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+       const data = await res.json();
 
-      const data = await res.json();
       if (res.ok) {
-        alert("Produk berhasil dihapus!");
-        // ⬇ Hapus produk dari state langsung tanpa fetch ulang
-        setProdukList((prev) =>
-          prev.map((p) =>
-            p.productId === id ? { ...p, isAvailable: false } : p
-          )
+        toast.success("Produk berhasil dihapus!");
+        setProdukList(
+          (prev) => prev.filter((p) => p.productId !== idToDelete) // Gunakan idToDelete
         );
       } else {
-        alert(data.msg || "Gagal menghapus produk");
+        toast.error(data.msg || "Gagal menghapus produk");
       }
     } catch (err) {
       console.error(err);
-      alert("Terjadi kesalahan server saat menghapus produk!");
+      toast.error("Terjadi kesalahan server saat menghapus produk!");
+    } finally {
+      await minDelay;
+      setIsActionLoading(false); // Hentikan loading
+      setIdToDelete(null); // Bersihkan ID
     }
+  };
+  const openDeleteModal = (id) => {
+    setIdToDelete(id); // Simpan ID yang akan dihapus
+    setShowDeleteModal(true); // Buka modal
   };
 
   if (loading) {
@@ -183,6 +201,15 @@ export default function ProdukTabel({
   return (
     <div className="bg-white rounded-xl shadow-md p-6 w-full">
       {/* Header atas */}
+      <Loading isLoading={isActionLoading} />
+      {/* 5. PASANG MODAL KONFIRMASI DI SINI */}
+      <KonfirmasiModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        title="Konfirmasi Hapus Produk"
+        message="Apakah Anda yakin ingin menghapus produk ini? Stok akan dinonaktifkan."
+      />
       <div className="flex justify-between items-center mb-5">
         <h2 className="text-lg font-semibold text-gray-700">Daftar Produk</h2>
         <div className="flex gap-3">
@@ -264,7 +291,7 @@ export default function ProdukTabel({
                       <FaEdit />
                     </button>
                     <button
-                      onClick={() => handleDelete(item.productId)}
+                      onClick={() => openDeleteModal(item.productId)}
                       className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-md"
                     >
                       <FaTrash />

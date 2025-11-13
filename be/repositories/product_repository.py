@@ -3,7 +3,9 @@ from models import Product
 #tambah weight supaya bisa filter kg beras
 def get_all_product(limit: int = 10, offset: int = 0, weight: int = None):
    
-    query = Product.query
+    # query = Product.query
+    # 👇 TAMBAHKAN FILTER INI UNTUK HANYA MENGAMBIL PRODUK YANG AKTIF
+    query = Product.query.filter_by(isAvailable=True)
 
     #tambah weight supaya bisa filter kg beras
     if weight is not None:

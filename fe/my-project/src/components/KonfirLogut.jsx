@@ -34,7 +34,7 @@ const KonfirLogut = () => {
         <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
           <Loading isLoading={isLoading} />
           <div className="bg-white rounded-lg p-6 w-80 text-center shadow-lg animate-fadeIn">
-            <h2 className="text-lg font-semibold mb-4">Konfirmasi Logout</h2>
+            <h2 className="text-lg font-semibold mb-4">Konfirmasi </h2>
             <p className="text-gray-600 mb-6">
               Apakah kamu yakin ingin Keluar?
             </p>

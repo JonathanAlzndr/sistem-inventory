@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
-const FormCatat = ({ isOpen, onClose, cart, setRefreshTrigger,setCart }) => {
+const FormCatat = ({ isOpen, onClose, cart, setRefreshTrigger, setCart }) => {
   if (!isOpen) return null;
 
   // State input user
@@ -18,12 +19,12 @@ const FormCatat = ({ isOpen, onClose, cart, setRefreshTrigger,setCart }) => {
 
   const handleSimpan = async () => {
     if (cart.length === 0) {
-      alert("Tidak ada produk yang dipilih!");
+      toast.warn("Tidak ada produk yang dipilih!");
       return;
     }
 
     if (!customerName) {
-      alert("Nama pemesan tidak boleh kosong!");
+      toast.warn("Nama pemesan tidak boleh kosong!");
       return;
     }
 
@@ -31,7 +32,7 @@ const FormCatat = ({ isOpen, onClose, cart, setRefreshTrigger,setCart }) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Token tidak ditemukan, silakan login ulang.");
+        toast.error("Token tidak ditemukan, silakan login ulang.");
         setLoading(false);
         return;
       }
@@ -63,13 +64,13 @@ const FormCatat = ({ isOpen, onClose, cart, setRefreshTrigger,setCart }) => {
 
       const data = await res.json();
       console.log("Transaksi berhasil:", data);
-      alert("Transaksi berhasil dicatat!");
+      toast.success("Transaksi berhasil dicatat!");
 
       // Trigger refresh tabel
       setRefreshTrigger((prev) => prev + 1);
 
       setCart([]);
-      
+
       // Reset form & tutup
       setcustomerName("");
       setTanggal("");
@@ -77,7 +78,7 @@ const FormCatat = ({ isOpen, onClose, cart, setRefreshTrigger,setCart }) => {
       onClose();
     } catch (err) {
       console.error("Error simpan transaksi:", err);
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }

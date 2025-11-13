@@ -4,12 +4,16 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import DetailPesanan from "./DetailPesanan";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import DeleteKonfirmasi from "./DeleteKonfirmasi"; 
+import DeleteKonfirmasi from "./DeleteKonfirmasi";
+import { toast } from "react-toastify";
+import Loading from "../kecilComponent/Loading";
 
 const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
   const [transactionList, setTransactionList] = useState([]);
   const [showDetail, setShowDetail] = useState(false);
   const [selectedTransactionId, setSelectedTransactionId] = useState(null);
+  const [isPageLoading, setIsPageLoading] = useState(true); // Untuk loading halaman awal
+  const [isActionLoading, setIsActionLoading] = useState(false); // Untuk hapus/edit
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
@@ -38,6 +42,8 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
         setTransactionList(data.transactionList || []);
       } catch (err) {
         console.error("Error fetching transactions:", err);
+      } finally {
+        setIsPageLoading(false);
       }
     };
 
@@ -50,18 +56,20 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
   };
 
   const executeDelete = async (password) => {
-    
     if (!password) {
-      alert("Password tidak boleh kosong!");
+      toast.warn("Password tidak boleh kosong!");
       return;
     }
-
-    console.log("Password diterima. Memproses hapus untuk ID:", idToDelete);
+    // MULAI LOADING 
+    setShowDeleteModal(false);
+    setIsActionLoading(true);
+    //jeda minimum 
+    const minDelay = new Promise((resolve) => setTimeout(resolve, 500));
 
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Token tidak ada, silakan login ulang.");
+        toast.error("Token tidak ada, silakan login ulang.");
         return;
       }
 
@@ -85,20 +93,24 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
       setTransactionList((prevList) =>
         prevList.filter((trx) => trx.transactionId !== idToDelete)
       );
-      alert("Transaksi berhasil dihapus.");
+      toast.success("Transaksi berhasil dihapus.");
     } catch (err) {
       console.error("Error deleting transaction:", err);
-      alert(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
+    } finally {
+      await minDelay; // Tunggu sisa waktu minimum
+      setIsActionLoading(false);
+      setIdToDelete(null);
     }
 
     setShowDeleteModal(false);
     setIdToDelete(null);
   };
 
-  // --- 3. FUNGSI HANDLEEXPORT DIPINDAHKAN KELUAR ---
+  //3. FUNGSI HANDLEEXPORT
   const handleExport = useCallback(() => {
     if (transactionList.length === 0) {
-      alert("Tidak ada data transaksi untuk diekspor!");
+      toast.info("Tidak ada data transaksi untuk diekspor!");
       return;
     }
 
@@ -161,15 +173,25 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
     });
 
     doc.save("Laporan-Transaksi-CRJAYA.pdf");
+    toast.success("Berhasil di unduh")
   }, [transactionList]);
 
-  // --- 4. useEffect UNTUK REGISTRASI DIPINDAHKAN KELUAR ---
+  //  useEffect UNTUK REGISTRASI
   useEffect(() => {
     setExportHandler(() => handleExport);
   }, [handleExport, setExportHandler]);
 
+  //KONDISI LOADING HALAMAN
+  if (isPageLoading) {
+    return (
+      <div className="w-full text-center p-10">
+        <p className="text-gray-500">Memuat data transaksi...</p>
+      </div>
+    );
+  }
   return (
     <div className="w-full overflow-x-auto mt-3">
+      <Loading isLoading={isActionLoading} />
       <div className="max-h-[350px] overflow-y-auto relative rounded-lg">
         <table className="w-full text-[13px] text-gray-700 border-collapse">
           <thead className="sticky top-0 z-20 bg-gray-100 shadow-sm">
@@ -203,17 +225,17 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
                   {index + 1}
                 </td>
                 <td className="border-t border-gray-200 px-3 py-2">{`T-${trx.transactionId}`}</td>
-                
+
                 {/* DATA BARU 1 */}
                 <td className="border-t border-gray-200 px-3 py-2">
                   {trx.customerName || "-"}
                 </td>
-                
+
                 <td className="border-t border-gray-200 px-3 py-2">
                   {/* Hanya Tanggal */}
                   {new Date(trx.transactionDate).toLocaleDateString("id-ID")}
                 </td>
-                
+
                 {/* DATA BARU 2 */}
                 <td className="border-t border-gray-200 px-3 py-2">
                   {/* Hanya Waktu */}
@@ -222,7 +244,7 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
                     minute: "2-digit",
                   })}
                 </td>
-                
+
                 <td className="border-t border-gray-200 px-3 py-2">
                   {trx.totalItems}
                 </td>

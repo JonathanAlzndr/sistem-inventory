@@ -4,6 +4,7 @@ import { useState } from "react";
 import gambar from "../../assets/gambar/dasbor.png";
 import { FaArrowRightLong } from "react-icons/fa6";
 import Loading from "../../kecilComponent/Loading";
+import { toast } from "react-toastify";
 
 const RoleLogin = () => {
   const [role, setRole] = useState("");
@@ -11,7 +12,7 @@ const RoleLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const HandleNext = () => {
-    if (!role) return alert("Pilih role dulu!");
+    if (!role) return toast.info("Pilih role dulu!");
     setIsLoading(true);
     setTimeout(() => {
       localStorage.setItem("role", role);

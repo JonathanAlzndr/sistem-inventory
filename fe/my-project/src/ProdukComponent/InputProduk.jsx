@@ -5,8 +5,15 @@ import {
   MdOutlineKeyboardArrowDown,
   MdOutlineKeyboardArrowUp,
 } from "react-icons/md";
+import { toast } from "react-toastify";
 
-const InputProduk = ({ editData, setProdukList, isOpen, setIsOpen,setEditData }) => {
+const InputProduk = ({
+  editData,
+  setProdukList,
+  isOpen,
+  setIsOpen,
+  setEditData,
+}) => {
   const [formData, setFormData] = useState({
     productName: "",
     receivedDate: "",
@@ -57,7 +64,7 @@ const InputProduk = ({ editData, setProdukList, isOpen, setIsOpen,setEditData })
     setFormData({ ...formData, imgPreview: null, imgPath: "image.jpg" });
   };
 
-   const handleReset = () => {
+  const handleReset = () => {
     setFormData({
       productName: "",
       receivedDate: "",
@@ -81,7 +88,7 @@ const InputProduk = ({ editData, setProdukList, isOpen, setIsOpen,setEditData })
       !formData.sellPrice ||
       !formData.purchasePrice
     ) {
-      return alert("Semua field wajib diisi!");
+      return toast.warn("Semua field wajib diisi!");
     }
 
     try {
@@ -125,7 +132,10 @@ const InputProduk = ({ editData, setProdukList, isOpen, setIsOpen,setEditData })
       const data = await res.json();
 
       if (res.ok) {
-        alert(isEdit ? "Produk berhasil diubah!" : "Produk berhasil dibuat!");
+        toast.success(
+          isEdit ? "Produk berhasil diubah!" : "Produk berhasil dibuat!"
+        );
+         setEditData(null);
 
         // update tabel frontend
         if (isEdit) {
@@ -145,7 +155,7 @@ const InputProduk = ({ editData, setProdukList, isOpen, setIsOpen,setEditData })
       }
     } catch (err) {
       console.error(err);
-      alert("Terjadi kesalahan server!");
+      toast.error("Terjadi kesalahan server!");
     }
   };
 
@@ -297,13 +307,14 @@ const InputProduk = ({ editData, setProdukList, isOpen, setIsOpen,setEditData })
               onClick={() => {
                 handleReset();
                 setIsOpen(false);
-                 setEditData(null);
+                setEditData(null);
               }}
               className="bg-red-500 text-white rounded-md hover:bg-red-600 transition w-full mt-2"
             >
               Batal
             </button>
             <button
+              
               type="submit"
               className="bg-blue-500 text-white rounded-md hover:bg-blue-600 transition w-full mt-2"
             >

@@ -16,6 +16,7 @@ from repositories.product_repository import (
 )
 #tambah weight supaya bisa filter kg beras
 def get_all_product_service(limit: int=10, offset: int=0, weight: int=None):
+    
     return repo_get_all_product(limit, offset, weight)
 
 def create_product_service(form_data, file):
