@@ -1,13 +1,18 @@
 from utils.extensions import db
 from models import Product
-from utils.exceptions import ProductNotFound
+#tambah weight supaya bisa filter kg beras
+def get_all_product(limit: int = 10, offset: int = 0, weight: int = None):
+   
+    # query = Product.query
+    # 👇 TAMBAHKAN FILTER INI UNTUK HANYA MENGAMBIL PRODUK YANG AKTIF
+    query = Product.query.filter_by(isAvailable=True)
 
-def get_all_product(limit: int = 10, offset: int = 0, include_unavailable: bool = False):
-    query = Product.query
-    if not include_unavailable:
-        query = query.filter_by(isAvailable=True)
-    return query.offset(offset).limit(limit).all()
-
+    #tambah weight supaya bisa filter kg beras
+    if weight is not None:
+        query = query.filter(Product.weight == weight)
+        
+    #tambah weight supaya bisa filter kg beras
+    return query.offset(offset=offset).limit(limit=limit)
 
 def create_new_product(data):
     try:

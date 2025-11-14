@@ -3,22 +3,29 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import gambar from "../../assets/gambar/dasbor.png";
 import { FaArrowRightLong } from "react-icons/fa6";
+import Loading from "../../kecilComponent/Loading";
+import { toast } from "react-toastify";
 
 const RoleLogin = () => {
   const [role, setRole] = useState("");
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const HandleNext = () => {
-    if (!role) return alert("Pilih role dulu!");
-    localStorage.setItem("role", role);
-
-    navigate("/Login"); // pindah ke halaman login
+    if (!role) return toast.info("Pilih role dulu!");
+    setIsLoading(true);
+    setTimeout(() => {
+      localStorage.setItem("role", role);
+      navigate("/Login");
+    }, 500);
+  
   };
 
   return (
     <div className="flex items-center  justify-center min-h-screen bg-white  ">
       <div className="w-[900px] h-[500px] flex    shadow-lg rounded-[10px]">
         {/* kotak kiri login */}
+        <Loading isLoading={isLoading} />
         <div className=" w-[450px] h-full p-10 py-23 ">
           <h2 className="text-2xl font-bold text-center mb-8">Pilih Role</h2>
           <form className="space-y-8 flex flex-col px-6 ">

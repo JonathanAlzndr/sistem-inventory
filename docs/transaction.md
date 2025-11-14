@@ -19,44 +19,46 @@ Cashier
   "customerName": "John Doe",
   "items": [
     {
-        "productId": 12,
-        "jumlah": 2
+      "productId": 12,
+      "jumlah": 2
     },
     {
-        "productId": 12,
-        "jumlah": 2
-    },
+      "productId": 12,
+      "jumlah": 2
+    }
   ]
 }
 ```
 
 ### Response Body (Success):
-```json 
+
+```json
 {
   "transactionId": 1,
   "transactionDate": "2025-10-25T11:15:33Z",
   "cashier": "Budi",
   "customerName": "John Doe",
   "items": [
-    { 
-        "productName": "beras A", 
-        "sellPrice": "3000.00", 
-        "quantity": 2, 
-        "subtotal": "6000.00"
+    {
+      "productName": "beras A",
+      "sellPrice": "3000.00",
+      "quantity": 2,
+      "subtotal": "6000.00"
     },
-    { 
-        "productName": "beras B",
-        "sellPrice": 12000,
-        "quantity": 1, 
-        "subtotal": "12000.00"
+    {
+      "productName": "beras B",
+      "sellPrice": 12000,
+      "quantity": 1,
+      "subtotal": "12000.00"
     }
-   ],
-   "totalPrice": "18000.00"
+  ],
+  "totalPrice": "18000.00"
 }
 ```
 
 ### Response Body (Insufficent Stock):
-```json 
+
+```json
 {
   "msg": "Insufficient stock for one of the products",
   "detail": {
@@ -64,12 +66,13 @@ Cashier
     "productName": "Beras A",
     "currentStock": 10,
     "requested": 12
-   }
+  }
 }
 ```
+
 ### Response Body (Product Not Found)
 
-``` json 
+```json
 {
   "error": "Not Found",
   "message": "Produk dengan ID yang diberikan tidak ditemukan.",
@@ -96,34 +99,35 @@ Cashier, Owner
 
 ### Query Parameters (Optional)
 
-| Parameter   | Type     | Description                                      |
-|--------------|----------|--------------------------------------------------|
-| `page`       | `int`    | Page number for pagination (default: `1`).      |
-| `size`       | `int`    | Number of products per page (default: `10`).    |
+| Parameter | Type  | Description                                  |
+| --------- | ----- | -------------------------------------------- |
+| `page`    | `int` | Page number for pagination (default: `1`).   |
+| `size`    | `int` | Number of products per page (default: `10`). |
 
+### Response Body (Success):
 
-### Response Body (Success):   
-```json 
-{  
-    "transactionList": [
-        {
-            "transactionId": 1,
-            "transactionDate": "2025-10-25T11:15:33Z",
-            "totalItems": 3,
-            "totalPrice": "15000.00"
-        },
-        {
-            "transactionId": 1,
-            "transactionDate": "2025-10-25T11:15:33Z",
-            "totalItems": 3,
-            "totalPrice": "15000.00"
-        },
-    ],
+```json
+{
+  "transactionList": [
+    {
+      "transactionId": 1,
+      "transactionDate": "2025-10-25T11:15:33Z",
+      "totalItems": 3,
+      "totalPrice": "15000.00"
+    },
+    {
+      "transactionId": 1,
+      "transactionDate": "2025-10-25T11:15:33Z",
+      "totalItems": 3,
+      "totalPrice": "15000.00"
+    }
+  ]
 }
 ```
 
 ### Response Body (Failed):
-```json 
+
+```json
 {
   "msg": "You do not have permission to access this resource."
 }
@@ -145,12 +149,14 @@ Cashier
 ### Endpoint: `GET api/transaction/{transactionId}`
 
 ### Path Variable
-| Parameter   | Type | Description |
-|--------------|------|-------------|
-| `transactionId`  | `int` | The ID of the transaction to fetch |
 
-### Response Body (Success): 
-```json 
+| Parameter       | Type  | Description                        |
+| --------------- | ----- | ---------------------------------- |
+| `transactionId` | `int` | The ID of the transaction to fetch |
+
+### Response Body (Success):
+
+```json
 {
     "transactionId": 1,
     "transactionDate": "2025-10-25T11:15:33Z",
@@ -175,7 +181,8 @@ Cashier
 ```
 
 ### Response Body (Failed):
-```json 
+
+```json
 {
   "msg": "You do not have permission to access this resource."
 }
@@ -195,14 +202,21 @@ Required (Bearer Token)
 Cashier
 
 ### Response Body (Success):
+
 ```json
 {
-    "msg": "Success to delete transaction"
+  "msg": "Success to delete transaction"
 }
 ```
 
 ### Response Body (Failed):
-```json 
+
+```json
 {
   "msg": "You do not have permission to access this resource."
 }
+
+
+
+
+

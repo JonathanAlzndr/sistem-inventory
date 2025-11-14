@@ -2,8 +2,13 @@ import React from "react";
 import Pilih from "../../../TransaksiComponent/Pilih";
 import Daftar from "../../../TransaksiComponent/Daftar";
 import ContainerTabel from "../../../TransaksiComponent/ContainerTabel";
+import { useState } from "react";
 
 const Transaksi = () => {
+    const [cart, setCart] = useState([]);
+      const [refreshTrigger, setRefreshTrigger] = useState(0);
+      const [pilihStatus, setPilihStatus] = useState("");
+
   return (
     <>
       <div className="space-y-10 px-3">
@@ -13,12 +18,13 @@ const Transaksi = () => {
             Monitoring dan Analisis Gudang
           </p>
         </div>
-        <section className="flex gap-5 flex-col justify-center ">
+        <section className="flex gap-5 flex-col justify-center  items-center">
           <div className="flex gap-5">
-            <Pilih />
-            <Daftar />
+            <Pilih  cart={cart} setCart={setCart}  pilihStatus={pilihStatus} 
+              setPilihStatus={setPilihStatus}  />
+            <Daftar  cart={cart} setCart={setCart} setRefreshTrigger={setRefreshTrigger} />
           </div>
-          <ContainerTabel />
+          <ContainerTabel refreshTrigger={refreshTrigger}/>
         </section>
       </div>
     </>
