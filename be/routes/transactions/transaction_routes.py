@@ -44,28 +44,32 @@ def create_transaction():
 
 @transaction_bp.route('/', methods=['GET'])
 @jwt_required()
-@roles_required('Cashier', 'Owner')
+# @roles_required('Cashier', 'Owner','staff') di hapus untuk get transaksi untuk dashboard semua roel
 def get_all_transaction():
     limit = request.args.get('limit', 10, type=int)
     offset = request.args.get('offset', 0, type=int)
 
     transactions = get_all_transactions_service(limit, offset)
 
-    result = [
-        {
+    result = []
+    for t in transactions:
+        # Hitung total item secara manual dari relasi order_details
+        total_items_count = sum(detail.quantity for detail in t.order_details)
+        item = {
             "transactionId": t.saleId, 
             "transactionDate": t.saleDate.isoformat(),
-            "totalItems": t.totalItems, 
+            "customerName": t.customerName,
+            "totalItems": total_items_count,
             "totalPrice": str(t.totalPrice)
         }
-        for t in transactions
-    ]
+        result.append(item)
+    
     
     return jsonify({"transactionList": result}), 200
 
 @transaction_bp.route('/<int:transactionId>', methods=['GET'])
 @jwt_required()
-@roles_required("Cashier")
+# @roles_required("Cashier") di hapus untuk get transaksi untuk dashboard semua roel
 def get_transaction_detail(transactionId):
     
     try:

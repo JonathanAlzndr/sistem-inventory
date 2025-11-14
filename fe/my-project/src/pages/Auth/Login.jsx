@@ -3,15 +3,23 @@ import { useState } from "react";
 import gambar from "../../assets/gambar/dasbor.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { MdKeyboardArrowLeft } from "react-icons/md";
+import Loading from "../../kecilComponent/Loading";
+import { toast } from 'react-toastify';
 
 export default function Login() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  function KembaliRole() {
+    navigate("/RoleLogin");
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,27 +31,40 @@ export default function Login() {
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) return alert("Login gagal!");
-
       const data = await res.json();
-      alert("login berhasil");
+      const selectedRole = localStorage.getItem("role");
 
-      localStorage.setItem("token", data.token);
+      // Validasi: cek apakah role akun sesuai dengan role yang dipilih
+      if (selectedRole !== data.user_role && !res.ok) {
+        toast.error("Username atau Password tidak Sesuai");
+        return;
+      }
+      setIsLoading(true);
+      toast.success("login berhasil")
+      setTimeout(() => {
+      
 
-      localStorage.setItem("role", data.user_role);
+        localStorage.setItem("token", data.token);
 
-      navigate("/dasbor");
-
-
+        localStorage.setItem("role", data.user_role);
+      
+        navigate("/dasbor");
+      }, 500);
     } catch (err) {
       console.error(err);
-      alert("Terjadi kesalahan server!");
+      toast.error("Terjadi kesalahan server!");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-white">
-      <div className="w-[900px] h-[500px] flex shadow-lg rounded-[10px]">
+    <div className="flex items-center justify-center min-h-screen bg-white relative">
+     
+      <div className="w-[900px] h-[500px] flex shadow-lg rounded-[10px] relative">
+        <Loading isLoading={isLoading} />
+        <MdKeyboardArrowLeft
+          onClick={KembaliRole}
+          className="absolute top-4 left-4 text-[30px] text-gray-700 hover:scale-110 duration-150 hover:border-2 rounded-full"
+        />
         <div className="w-[450px] h-full p-10 py-23">
           <h2 className="text-2xl font-bold text-center mb-6">Masuk</h2>
           <form

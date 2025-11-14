@@ -48,6 +48,7 @@ def create_new_transaction_service(items_list, cashier_id, customer_name):
                         "productId": product.productId,
                         "productName": product.productName,
                         "currentStock": product.currentStock,
+                
                         "requested": requested_qty
                     }
                 )

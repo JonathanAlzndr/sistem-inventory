@@ -1,15 +1,111 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import BttnEkspor from "../kecilComponent/bttnEkspor";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { CgAddR } from "react-icons/cg";
+import { toast } from "react-toastify";
+import Loading from "../kecilComponent/Loading";
+import KonfirmasiModal from "../kecilComponent/InfoKonfirmasi";
 
-export default function ProdukTabel() {
-  const [produkList, setProdukList] = useState([]);
+
+export default function ProdukTabel({
+  setEditData,
+  setProdukList,
+  produkList,
+  setIsOpen,
+}) {
+  const [isActionLoading, setIsActionLoading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [idToDelete, setIdToDelete] = useState(null);
 
   const handleExport = () => {
-    alert("Fitur ekspor data masih coming soon 🚀");
+    if (produkList.length === 0) {
+      toast.info("Tidak ada data untuk diekspor!");
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    // --- 1. MEMBUAT HEADER PERUSAHAAN ---
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight(); // (Opsional, untuk footer)
+    const today = new Date().toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+
+    // Judul Perusahaan (Besar dan di Tengah)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("CR.JAYA", pageWidth / 2, 20, { align: "center" });
+
+    // Judul Laporan (Lebih kecil, di bawahnya)
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(14);
+    doc.text("Laporan Data Produk", pageWidth / 2, 30, { align: "center" });
+
+    // Tanggal Cetak (Kecil, di kiri)
+    doc.setFontSize(10);
+    doc.text(`Tanggal Cetak: ${today}`, 14, 40); // 14 adalah margin kiri
+
+    // Garis Pemisah
+    doc.setDrawColor(180, 180, 180); // Warna garis abu-abu
+    doc.line(14, 45, pageWidth - 14, 45); // Garis dari margin kiri ke kanan
+
+    // --- 2. MEMBUAT TABEL (Sama seperti sebelumnya) ---
+
+    const tableHeaders = [
+      "Nama Produk",
+      "Berat (kg)",
+      "Stok",
+      "Harga Jual",
+      "Harga Beli",
+      "Tgl. Masuk",
+    ];
+
+    const tableBody = produkList.map((p) => [
+      p.productName,
+      p.weight,
+      p.currentStock,
+      `Rp${Number(p.sellPrice || 0).toLocaleString("id-ID")}`,
+      `Rp${Number(p.purchasePrice || 0).toLocaleString("id-ID")}`,
+      p.receivedDate
+        ? new Date(p.receivedDate).toLocaleDateString("id-ID")
+        : "-",
+    ]);
+
+    // Gunakan 'autoTable' sebagai fungsi
+    autoTable(doc, {
+      startY: 50, // <-- PENTING: Mulai tabel di bawah header (Y=50)
+      head: [tableHeaders],
+      body: tableBody,
+      theme: "grid",
+
+      // --- 3. (OPSIONAL) MEMBUAT FOOTER/NOMOR HALAMAN ---
+      // Ini akan otomatis menambahkan footer di SETIAP halaman
+      didDrawPage: (data) => {
+        // Footer
+        const pageCount = doc.internal.getNumberOfPages();
+        doc.setFontSize(10);
+        doc.text(
+          `Halaman ${data.pageNumber} dari ${pageCount}`,
+          pageWidth / 2,
+          pageHeight - 10, // Posisi 10mm dari bawah
+          { align: "center" }
+        );
+      },
+    });
+
+    // --- 4. SIMPAN FILE ---
+    doc.save("Laporan-Produk-CRJAYA.pdf");
+    toast.success("Data berhasil diekspor!");
   };
 
+  // Ambil data produk saat pertama kali load
   const fetchProduk = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -19,59 +115,115 @@ export default function ProdukTabel() {
         return;
       }
 
-      const res = await fetch("http://127.0.0.1:5000/api/products/?limit=20&offset=0", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // ✅ Wajib agar tidak 401
-        },
-      });
+      const res = await fetch(
+        "http://127.0.0.1:5000/api/products/?limit=20&offset=0",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!res.ok) {
-        // Kalau token salah / expired
         if (res.status === 401) {
-          alert("Sesi Anda telah berakhir. Silakan login ulang.");
+          toast.info("Sesi Anda berakhir, silakan login ulang.");
           localStorage.removeItem("token");
-          window.location.href = "/"; 
+          window.location.href = "/";
           return;
         }
-
-  
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.msg || "Gagal mengambil data produk");
       }
 
       const data = await res.json();
       setProdukList(data.productList || []);
-      console.log(data)
     } catch (err) {
       console.error("Fetch error:", err);
-      alert("Terjadi kesalahan saat mengambil data produk");
+      toast.error("Terjadi kesalahan saat mengambil data produk");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-  fetchProduk();
-
-  const refreshHandler = () => {
     fetchProduk();
+  }, []); //  hanya dijalankan sekali
+
+  //  Hapus produk langsung dari list
+ 
+  const executeDelete = async () => {
+    // Tutup modal dan mulai loading
+    setShowDeleteModal(false);
+    setIsActionLoading(true);
+    const minDelay = new Promise((resolve) => setTimeout(resolve, 500));
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        // Gunakan 'idToDelete' dari state
+        `http://127.0.0.1:5000/api/products/${idToDelete}/deactivate`,
+        {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+       const data = await res.json();
+
+      if (res.ok) {
+        toast.success("Produk berhasil dihapus!");
+        setProdukList(
+          (prev) => prev.filter((p) => p.productId !== idToDelete) // Gunakan idToDelete
+        );
+      } else {
+        toast.error(data.msg || "Gagal menghapus produk");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Terjadi kesalahan server saat menghapus produk!");
+    } finally {
+      await minDelay;
+      setIsActionLoading(false); // Hentikan loading
+      setIdToDelete(null); // Bersihkan ID
+    }
   };
-   window.addEventListener("storage", refreshHandler);
-  return () => window.removeEventListener("storage", refreshHandler);
-}, []);
+  const openDeleteModal = (id) => {
+    setIdToDelete(id); // Simpan ID yang akan dihapus
+    setShowDeleteModal(true); // Buka modal
+  };
 
   if (loading) {
-    return <p className="text-gray-500 text-center mt-4">Memuat data produk...</p>;
+    return (
+      <p className="text-gray-500 text-center mt-4">Memuat data produk...</p>
+    );
   }
-
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6 w-full">
       {/* Header atas */}
+      <Loading isLoading={isActionLoading} />
+      {/* 5. PASANG MODAL KONFIRMASI DI SINI */}
+      <KonfirmasiModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={executeDelete}
+        title="Konfirmasi Hapus Produk"
+        message="Apakah Anda yakin ingin menghapus produk ini? Stok akan dinonaktifkan."
+      />
       <div className="flex justify-between items-center mb-5">
         <h2 className="text-lg font-semibold text-gray-700">Daftar Produk</h2>
-        <BttnEkspor onClick={handleExport} />
+        <div className="flex gap-3">
+          <button
+            onClick={() => {
+              setEditData(null); // 🔹 keluar dari mode edit
+              setIsOpen(true);
+            }}
+            className="hover:scale-102 duration-95 p-1 border rounded-[7px] bg-green-500 border-gray-300 text-white text-[13px] w-[140px] gap-2 flex items-center justify-center"
+          >
+            Tambah Produk <CgAddR className="text-[14px]" />
+          </button>
+          <BttnEkspor onClick={handleExport} />
+        </div>
       </div>
 
       {/* Tabel produk */}
@@ -124,7 +276,7 @@ export default function ProdukTabel() {
                         : "text-green-600"
                     }`}
                   >
-                    {item.currentStock}
+                    {item.currentStock == 0 ? "Habis" : item.currentStock}
                   </td>
                   <td className="p-3 text-gray-600">
                     {item.receivedDate
@@ -132,10 +284,16 @@ export default function ProdukTabel() {
                       : "-"}
                   </td>
                   <td className="p-3 flex justify-center gap-3">
-                    <button className="p-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded-md">
+                    <button
+                      onClick={() => setEditData(item)}
+                      className="p-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded-md"
+                    >
                       <FaEdit />
                     </button>
-                    <button className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-md">
+                    <button
+                      onClick={() => openDeleteModal(item.productId)}
+                      className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-md"
+                    >
                       <FaTrash />
                     </button>
                   </td>

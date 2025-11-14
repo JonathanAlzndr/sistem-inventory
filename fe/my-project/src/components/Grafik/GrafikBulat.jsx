@@ -7,7 +7,7 @@ const GrafikBulat = () => {
       <div className=" p-4 space-y-1 rounded-[10px] shadow-md bg-white w-full h-[458px] ">
         <div className="flex item-center gap-4 ">
           <BiSolidPieChartAlt2 className="text-2xl text-red-600" />
-          <h1 className="text-[16px]">Grafik Penjualan Bulanan</h1>
+          <h1 className="text-[16px]">Grafik Jumlah Stok</h1>
         </div>
         <p className="text-[12px] text-gray-500">Menampilkan persentase stok beras berdasarkan jenis yang tersedia di gudang.</p>
     <ChartBulat/>
