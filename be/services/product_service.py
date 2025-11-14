@@ -84,11 +84,55 @@ def deactivate_product_service(productId):
     except ProductNotFound as e:
         raise e
 
-def update_product_service(product_id, update_data):
+def save_uploaded_file(file, product_name):
+    save_path = ""
+    unique_filename = ""
+    
+    try:
+        safe_name = secure_filename(product_name.replace(' ', '-').lower())
+        ext = file.filename.rsplit('.', 1)[1].lower() 
+        unique_filename = f"{uuid.uuid4()}-{safe_name}.{ext}"
+
+        upload_folder = Config.UPLOAD_FOLDER
+        if not upload_folder:
+            raise FileSaveError("UPLOAD FOLDER tidak dikonfigurasi")
+        
+        save_path = os.path.join(upload_folder, unique_filename)
+
+        file.save(save_path)
+        
+        return unique_filename
+        
+    except Exception as e:
+        raise FileSaveError(msg=f"Gagal menyimpan file: {str(e)}")
+
+def delete_file_from_disk(filename):
+    try:
+        upload_folder = Config.UPLOAD_FOLDER
+        
+        if not upload_folder:
+            print("Peringatan: UPLOAD FOLDER tidak dikonfigurasi. Tidak dapat menghapus file.")
+            return
+
+        file_path = os.path.join(upload_folder, filename)
+        
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        else:
+            print(f"Peringatan: File tidak ditemukan di disk untuk dihapus: {file_path}")
+
+    except Exception as e:
+        print(f"Error saat mencoba menghapus file {filename}: {str(e)}")
+
+def update_product_service(product_id, update_data, new_image_file):
     product = repo_get_product_by_id(product_id)
 
     if not product:
         raise ProductNotFound(msg="Product not found") 
+    
+    old_img_path = product.productImg
+    new_img_path_in_db = None
+    
     try:
         if "productName" in update_data:
             product.productName = str(update_data["productName"])
@@ -97,7 +141,7 @@ def update_product_service(product_id, update_data):
             product.receivedDate = datetime.fromisoformat(
                 update_data["receivedDate"].replace('Z', '+00:00')
             )
-            
+
         if "weight" in update_data:
             weight = int(update_data["weight"])
             if weight <= 0:
@@ -125,13 +169,28 @@ def update_product_service(product_id, update_data):
                 raise ValueError("Purchase price cannot be negative")
             product.purchasePrice = price
 
+        if new_image_file:
+            new_img_path_in_db = save_uploaded_file(new_image_file, product.productName) 
+            product.productImg = new_img_path_in_db
+            
         db.session.commit()
+        
+        if new_img_path_in_db and old_img_path:
+            delete_file_from_disk(old_img_path)
         
         return product 
 
-    except (ValueError, TypeError, InvalidOperation) as e:
+    except (ValueError, TypeError, InvalidOperation, FileSaveError) as e:
         db.session.rollback()
-        raise ValidationError(msg=f"Invalid data type or value: {e}")
+        if new_img_path_in_db:
+            delete_file_from_disk(new_img_path_in_db)
+        if isinstance(e, FileSaveError):
+            raise e
+        else:
+            raise ValidationError(msg=f"Invalid data type or value: {e}")
+            
     except Exception as e:
         db.session.rollback()
+        if new_img_path_in_db:
+            delete_file_from_disk(new_img_path_in_db)
         raise e
