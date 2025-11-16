@@ -7,7 +7,7 @@ import { CgAddR } from "react-icons/cg";
 import { toast } from "react-toastify";
 import Loading from "../kecilComponent/Loading";
 import KonfirmasiModal from "../kecilComponent/InfoKonfirmasi";
-
+import { useWeightFilter, useProdukFiltered } from "./UseProdukFilter";
 
 export default function ProdukTabel({
   setEditData,
@@ -19,6 +19,16 @@ export default function ProdukTabel({
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
+
+  // 1. dropdown berat
+  const { weightList, selectedWeight, setSelectedWeight } = useWeightFilter();
+
+  // 2. produk terfilter
+  const {
+    produkList: produkFiltered,
+    setProdukList: setProdukListFiltered,
+    loading: loadingFiltered,
+  } = useProdukFiltered(selectedWeight);
 
   const handleExport = () => {
     if (produkList.length === 0) {
@@ -116,7 +126,7 @@ export default function ProdukTabel({
       }
 
       const res = await fetch(
-        "http://127.0.0.1:5000/api/products/?limit=20&offset=0",
+        "http://127.0.0.1:5000/api/products/?limit=1000&offset=0",
         {
           headers: {
             "Content-Type": "application/json",
@@ -146,12 +156,8 @@ export default function ProdukTabel({
     }
   };
 
-  useEffect(() => {
-    fetchProduk();
-  }, []); //  hanya dijalankan sekali
-
   //  Hapus produk langsung dari list
- 
+
   const executeDelete = async () => {
     // Tutup modal dan mulai loading
     setShowDeleteModal(false);
@@ -168,7 +174,7 @@ export default function ProdukTabel({
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-       const data = await res.json();
+      const data = await res.json();
 
       if (res.ok) {
         toast.success("Produk berhasil dihapus!");
@@ -192,7 +198,7 @@ export default function ProdukTabel({
     setShowDeleteModal(true); // Buka modal
   };
 
-  if (loading) {
+  if (loadingFiltered) {
     return (
       <p className="text-gray-500 text-center mt-4">Memuat data produk...</p>
     );
@@ -215,13 +221,26 @@ export default function ProdukTabel({
         <div className="flex gap-3">
           <button
             onClick={() => {
-              setEditData(null); // 🔹 keluar dari mode edit
+              setEditData(null); // keluar dari mode edit
               setIsOpen(true);
             }}
             className="hover:scale-102 duration-95 p-1 border rounded-[7px] bg-green-500 border-gray-300 text-white text-[13px] w-[140px] gap-2 flex items-center justify-center"
           >
             Tambah Produk <CgAddR className="text-[14px]" />
           </button>
+          <select
+            value={selectedWeight}
+            onChange={(e) => setSelectedWeight(e.target.value)}
+            className="p-2 border border-gray-300 rounded-[7px] w-[140px]  text-sm bg-gray-50"
+          >
+            <option value="">Semua</option>
+            {weightList.map((w) => (
+              <option key={w} value={w}>
+                {w} kg
+              </option>
+            ))}
+          </select>
+
           <BttnEkspor onClick={handleExport} />
         </div>
       </div>
@@ -243,8 +262,8 @@ export default function ProdukTabel({
           </thead>
 
           <tbody>
-            {produkList.length > 0 ? (
-              produkList.map((item, index) => (
+            {produkFiltered.length > 0 ? (
+              produkFiltered.map((item, index) => (
                 <tr
                   key={item.productId || index}
                   className="hover:bg-gray-50 transition border-b border-gray-100 last:border-none"

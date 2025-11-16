@@ -7,6 +7,7 @@ import autoTable from "jspdf-autotable";
 import DeleteKonfirmasi from "./DeleteKonfirmasi";
 import { toast } from "react-toastify";
 import Loading from "../kecilComponent/Loading";
+import { FaRepeat } from "react-icons/fa6";
 
 const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
   const [transactionList, setTransactionList] = useState([]);
@@ -17,6 +18,9 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
+
+  // const [showReturModal, setShowReturModal] = useState(false);
+  // const [idToRetur, setIdToRetur] = useState(null);
 
   useEffect(() => {
     const fetchTransaksi = async () => {
@@ -60,10 +64,10 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
       toast.warn("Password tidak boleh kosong!");
       return;
     }
-    // MULAI LOADING 
+    // MULAI LOADING
     setShowDeleteModal(false);
     setIsActionLoading(true);
-    //jeda minimum 
+    //jeda minimum
     const minDelay = new Promise((resolve) => setTimeout(resolve, 500));
 
     try {
@@ -106,6 +110,54 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
     setShowDeleteModal(false);
     setIdToDelete(null);
   };
+
+// const executeRetur = async (password) => {
+//   if (!password) {
+//     toast.warn("Password tidak boleh kosong!");
+//     return;
+//   }
+
+//   setShowReturModal(false);
+//   setIsActionLoading(true);
+
+//   const minDelay = new Promise((resolve) => setTimeout(resolve, 500));
+
+//   try {
+//     const token = localStorage.getItem("token");
+
+//     const res = await fetch(
+//       `http://127.0.0.1:5000/api/transaction/retur/${idToRetur}`,
+//       {
+//         method: "PATCH",
+//         credentials: "include",
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({ password }),
+//       }
+//     );
+
+//     if (!res.ok) {
+//       const errorData = await res.json();
+//       throw new Error(errorData.msg || "Gagal memproses retur");
+//     }
+
+//     // update list transaksi
+//     setTransactionList((prev) =>
+//       prev.filter((trx) => trx.transactionId !== idToRetur)
+//     );
+
+//     toast.success("Retur berhasil. Stok dikembalikan.");
+//   } catch (err) {
+//     toast.error(err.message);
+//   } finally {
+//     await minDelay;
+//     setIsActionLoading(false);
+//     setIdToRetur(null);
+//   }
+// };
+
 
   //3. FUNGSI HANDLEEXPORT
   const handleExport = useCallback(() => {
@@ -173,7 +225,7 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
     });
 
     doc.save("Laporan-Transaksi-CRJAYA.pdf");
-    toast.success("Berhasil di unduh")
+    toast.success("Berhasil di unduh");
   }, [transactionList]);
 
   //  useEffect UNTUK REGISTRASI
@@ -201,7 +253,7 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
                 ID Transaksi
               </th>
               {/* KOLOM BARU 1 */}
-              <th className="px-3 py-2 border-b border-gray-300">
+              <th className="px-3 py-2 border-b border-gray-300 text-left">
                 Nama Pemesan
               </th>
               <th className="px-3 py-2 border-b border-gray-300">Tanggal</th>
@@ -227,7 +279,7 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
                 <td className="border-t border-gray-200 px-3 py-2">{`T-${trx.transactionId}`}</td>
 
                 {/* DATA BARU 1 */}
-                <td className="border-t border-gray-200 px-3 py-2">
+                <td className="border-t border-gray-200 px-3 py-2 text-left">
                   {trx.customerName || "-"}
                 </td>
 
@@ -259,7 +311,18 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
                     Detail
                   </button>
                 </td>
-                <td className="border-t border-gray-200 px-3 flex justify-center py-2">
+
+                <td className="border-t border-gray-200  flex justify-center py-2">
+                  {/* <button
+                    onClick={() => {
+                      setIdToRetur(trx.transactionId);
+                      setShowReturModal(true);
+                    }}
+                    className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 transition"
+                  >
+                    <FaRepeat className="text-green-500 hover:text-green-700" />
+                  </button> */}
+
                   <button
                     onClick={() => {
                       setIdToDelete(trx.transactionId);
@@ -284,6 +347,14 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
           transactionId={selectedTransactionId}
         />
       )}
+
+      {/* {showReturModal && (
+        <ReturKonfirmasi
+          isOpen={showReturModal}
+          onClose={() => setShowReturModal(false)}
+          onConfirm={executeRetur}
+        />
+      )} */}
 
       {/* Modal Konfirmasi Hapus */}
       {showDeleteModal && (

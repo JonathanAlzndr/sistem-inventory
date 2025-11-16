@@ -95,15 +95,28 @@ const InputProduk = ({
       const token = localStorage.getItem("token");
       const isEdit = !!editData;
 
-      const payload = {
-        productName: formData.productName,
-        receivedDate: new Date(formData.receivedDate).toISOString(),
-        weight: parseFloat(formData.weight),
-        currentStock: parseInt(formData.currentStock),
-        sellPrice: parseFloat(formData.sellPrice),
-        purchasePrice: parseFloat(formData.purchasePrice),
-        imgPath: formData.imgPath || "image.jpg",
-      };
+      const form = new FormData();
+      form.append("productName", formData.productName);
+      form.append(
+        "receivedDate",
+        new Date(formData.receivedDate).toISOString()
+      );
+      form.append("weight", Number(formData.weight));
+      form.append("currentStock", Number(formData.currentStock));
+      form.append(
+        "receivedDate",
+        new Date(formData.receivedDate).toISOString()
+      );
+
+      form.append("sellPrice", parseFloat(formData.sellPrice));
+      form.append("purchasePrice", parseFloat(formData.purchasePrice));
+
+      if (document.getElementById("uploadGambar").files[0]) {
+        form.append(
+          "imgPath",
+          document.getElementById("uploadGambar").files[0]
+        );
+      }
 
       let res;
       if (isEdit) {
@@ -112,20 +125,18 @@ const InputProduk = ({
           {
             method: "PATCH",
             headers: {
-              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify(payload),
+            body: form,
           }
         );
       } else {
-        res = await fetch("http://127.0.0.1:5000/api/products", {
+        res = await fetch("http://127.0.0.1:5000/api/products/", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(payload),
+          body: form,
         });
       }
 
@@ -135,17 +146,17 @@ const InputProduk = ({
         toast.success(
           isEdit ? "Produk berhasil diubah!" : "Produk berhasil dibuat!"
         );
-         setEditData(null);
+        setEditData(null);
 
         // update tabel frontend
         if (isEdit) {
           setProdukList((prev) =>
             prev.map((p) =>
-              p.productId === editData.productId ? { ...p, ...payload } : p
+              p.productId === editData.productId ? { ...p, ...data } : p
             )
           );
         } else {
-          setProdukList((prev) => [...prev, payload]);
+          setProdukList((prev) => [...prev, formData]);
         }
 
         handleReset();
@@ -314,7 +325,6 @@ const InputProduk = ({
               Batal
             </button>
             <button
-              
               type="submit"
               className="bg-blue-500 text-white rounded-md hover:bg-blue-600 transition w-full mt-2"
             >

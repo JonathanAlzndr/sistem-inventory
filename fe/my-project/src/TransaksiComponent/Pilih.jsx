@@ -42,23 +42,22 @@ const Pilih = ({ pilihStatus, setPilihStatus, cart, setCart }) => {
             Pilih produk untuk pencatatan Transaksi
           </p>
         </div>
-        
+
         {/* 4. Ubah <select> agar dinamis */}
-        <select
-          value={pilihStatus}
-          onChange={(e) => setPilihStatus(e.target.value)}
-          className=" p-1 border border-gray-300 bg-gray-50 w-[200px] h-[34px]  rounded-[6px] focus:outline-none focus:ring focus:ring-blue-400"
-        >
-          {/* Opsi default */}
-          <option value="">Semua Kategori</option>
-          
-          {/* 5. Render <option> menggunakan .map() dari state */}
-          {categories.map((weight) => (
-            <option key={weight} value={weight}>
-              {weight} kg
-            </option>
-          ))}
-        </select>
+<select
+  value={pilihStatus}
+  onChange={(e) => setPilihStatus(e.target.value)}
+  className="p-1 border border-gray-300 bg-gray-50 w-[200px] h-[34px] rounded-[6px] focus:outline-none focus:ring focus:ring-blue-400"
+>
+  <option value="">Semua Kategori</option>
+
+  {categories.map((weight) => (
+    <option key={weight} value={String(weight)}>
+      {weight} kg
+    </option>
+  ))}
+</select>
+
       </header>
       <div className="mt-3  ">
         <ListProduk cart={cart} setCart={setCart} pilihStatus={pilihStatus} />

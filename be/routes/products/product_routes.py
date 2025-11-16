@@ -25,7 +25,7 @@ def get_image_url(filename):
 @product_bp.route('/', methods=['GET'])
 @jwt_required()
 def get_all_products():
-    limit = request.args.get('limit', 10, type=int)
+    limit = request.args.get('limit', type=int)
     offset = request.args.get('offset', 0, type=int)
     #tambah weight supaya bisa filter kg beras
     weight_filter = request.args.get('weight', type=int)
@@ -152,16 +152,25 @@ def deactivate_product(productId):
     except Exception as e:
         return jsonify({"msg": f"Failed to deactivate product: {str(e)}"}), 500
 
+import os # Pastikan ini diimpor jika diperlukan untuk penyimpanan file
+
 @product_bp.route('/<int:productId>', methods=['PATCH'])
 @jwt_required()
 @roles_required("Staff")
 def update_product(productId):
-    data = request.get_json()
-    if not data:
-        return jsonify(msg="No data provided to update"), 400
+    data = request.form.to_dict() 
+    file = request.files.get('imgPath') 
 
+    if not data and not file:
+        return jsonify(msg="No data or file provided to update"), 400
+
+    if file:
+        if not file_extensions.allowed_file(file.filename):
+            return jsonify(msg='File type not allowed'), 400
+    
     try:
-        updated_product = update_product_service(productId, data)
+        updated_product = update_product_service(productId, data, file)
+        
         return jsonify(
             msg="Success to update product",
             product={

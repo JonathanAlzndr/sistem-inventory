@@ -112,9 +112,7 @@ const Card = () => {
   }, [token]);
 
 
-  // ... (Sisa kode JSX untuk 'dataCards' dan 'return' Anda sudah benar) ...
-  // ... Tidak perlu diubah ...
-  
+
   const dataCards = [
     {
       title: "Total Stok Beras",

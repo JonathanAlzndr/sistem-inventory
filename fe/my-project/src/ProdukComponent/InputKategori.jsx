@@ -1,7 +1,7 @@
 import React from "react";
 
 const InputKategori = ({ value, onChange }) => {
-  const kategoriList = ["5 kg", "10 kg", "25 kg", "50 kg"];
+  const kategoriList = [5, 10, 25, 50];
 
   return (
     <div className="flex flex-col">

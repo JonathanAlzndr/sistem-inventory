@@ -144,7 +144,7 @@ Get Detail of a Transaction
 Required (Bearer Token)
 
 **Access:**
-Cashier
+CashierA
 
 ### Endpoint: `GET api/transaction/{transactionId}`
 

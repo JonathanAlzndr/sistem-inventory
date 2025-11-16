@@ -57,9 +57,32 @@ const FormCatat = ({ isOpen, onClose, cart, setRefreshTrigger, setCart }) => {
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(
-          `Gagal simpan transaksi: ${res.status} - ${JSON.stringify(errorData)}`
-        );
+        // Cek apakah ini error "Insufficient Stock"
+        if (
+          errorData.msg === "Insufficient stock for one of the products" &&
+          errorData.detail
+        ) {
+          const detail = errorData.detail;
+
+          // Buat pesan error yang bagus dan spesifik
+          const errorMessage = `Stok tidak cukup untuk "${detail.productName}". 
+          Stok tersisa: ${detail.currentStock}, 
+          Anda meminta: ${detail.requested}.`;
+
+          // Tampilkan pesan error yang bagus
+          toast.error(errorMessage);
+
+          // Jangan 'throw error', cukup 'return' agar 'finally' tetap berjalan
+          return;
+        }
+
+        // Jika ini error lain (misal: "Product Not Found")
+        if (errorData.msg) {
+          throw new Error(errorData.msg);
+        }
+
+        // Fallback jika tidak ada .msg
+        throw new Error(`Gagal simpan transaksi: ${res.status}`);
       }
 
       const data = await res.json();

@@ -35,7 +35,7 @@ export default function Login() {
       const selectedRole = localStorage.getItem("role");
 
       // Validasi: cek apakah role akun sesuai dengan role yang dipilih
-      if (selectedRole !== data.user_role && !res.ok) {
+      if (selectedRole !== data.user_role ) {
         toast.error("Username atau Password tidak Sesuai");
         return;
       }

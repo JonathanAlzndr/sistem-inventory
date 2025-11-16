@@ -1,49 +1,45 @@
 import React, { useState, useEffect } from "react";
 import Chart from "react-apexcharts";
 
-// Opsi (styling) untuk line chart
 const chartOptions = {
   chart: {
-    type: "line",
-    height: 350,
-    zoom: { enabled: false },
+    type: "bar",
+    height: 350
   },
   title: {
-   
+  
     align: "center",
     style: {
-      fontFamily: "poppines",
+      fontFamily: "poppins",
       fontSize: "16px",
       color: "#111111",
-      fontWeight: 600,
-    },
+      fontWeight: 600
+    }
+  },
+  plotOptions: {
+    bar: {
+      horizontal: false,
+      columnWidth: "60%"
+    }
   },
   dataLabels: { enabled: false },
-  stroke: {
-    width: 4,
-    curve: "stepline",
-  },
   legend: {
     position: "bottom",
-    labels: {
-      colors: "#000000",
-    },
+    labels: { colors: "#000000" }
   },
   xaxis: {
-    categories: ["4 Mgg Lalu", "3 Mgg Lalu", "2 Mgg Lalu", "Minggu Ini"],
+    categories: ["4 Minggu Lalu", "3 Minggu Lalu", "2 Minggu Lalu", "Minggu Ini"]
   },
   tooltip: {
     y: {
-      formatter: function (val) {
-        return val + " item";
-      },
-    },
+      formatter: val => "Rp " + val.toLocaleString("id-ID")
+    }
   },
   grid: { borderColor: "#f1f1f1" },
-  colors: ["#22c55e", "#f87171", "#60a5fa", "#f97316", "#ef4444", "#9333ea"],
+  colors: ["#22c55e", "#60a5fa", "#f97316", "#ef4444", "#9333ea"]
 };
 
-export default function ChartGaris() {
+export default function GrafikStokBeras() {
   const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -59,110 +55,94 @@ export default function ChartGaris() {
 
       setLoading(true);
       setError(null);
-      
-      // --- PERBAIKAN DI SINI ---
 
-      // 1. Ini HANYA berisi headers
-      const commonHeaders = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      };
-
-      // 2. Ini adalah OPSI fetch, dengan 'credentials' di luar 'headers'
       const fetchOptions = {
         method: "GET",
-        headers: commonHeaders,
-        credentials: "include", // <-- Dipindahkan ke sini
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
       };
-      
-      // --------------------------
 
       try {
-        // 3. Ambil DAFTAR transaksi (1000 terakhir)
+        // 1. Ambil produk
+        const resProducts = await fetch(
+          "http://127.0.0.1:5000/api/products/?limit=1000&offset=0",
+          fetchOptions
+        );
+        if (!resProducts.ok) throw new Error("Gagal mengambil data produk");
+        const dataProducts = await resProducts.json();
+
+        const weightMap = new Map();
+        dataProducts.productList.forEach(p => {
+          weightMap.set(p.productName, p.weight);
+        });
+
+        // 2. List transaksi
         const resList = await fetch(
           "http://127.0.0.1:5000/api/transaction/?limit=1000",
-          fetchOptions // <-- Gunakan fetchOptions
+          fetchOptions
         );
         if (!resList.ok) throw new Error("Gagal mengambil daftar transaksi");
         const dataList = await resList.json();
-        
+
         const today = new Date();
-        const transactionsInLastMonth = [];
+        const last28Days = [];
 
-        // 4. Filter transaksi HANYA 4 minggu (28 hari) terakhir
-        if (dataList.transactionList) {
-          dataList.transactionList.forEach(trx => {
-            const trxDate = new Date(trx.transactionDate);
-            const diffTime = Math.abs(today - trxDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            if (diffDays <= 28) {
-              transactionsInLastMonth.push({
-                id: trx.transactionId,
-                date: trxDate,
-                diffDays: diffDays
-              });
-            }
-          });
-        }
+        dataList.transactionList?.forEach(trx => {
+          const date = new Date(trx.transactionDate);
+          const diff = Math.ceil(Math.abs(today - date) / (1000 * 60 * 60 * 24));
 
-        if (transactionsInLastMonth.length === 0) {
-            setLoading(false);
-            setSeries([]); // Tidak ada data
-            return;
-        }
-
-        // 5. Ambil DETAIL untuk setiap transaksi (Ini bagian yang lambat)
-        const detailPromises = transactionsInLastMonth.map(trx =>
-          fetch(`http://127.0.0.1:5000/api/transaction/${trx.id}`, 
-            fetchOptions // <-- Gunakan fetchOptions juga di sini
-          ).then(res => {
-            if (!res.ok) throw new Error(`Detail fetch failed for ${trx.id}`);
-            return res.json();
-          })
-        );
-
-        const detailedTransactions = await Promise.all(detailPromises);
-
-        // 6. Proses Data: Kelompokkan per produk dan per minggu
-        const weeklyProductData = {}; 
-
-        detailedTransactions.forEach((detailTrx, index) => {
-          const originalTrx = transactionsInLastMonth[index];
-          const diffDays = originalTrx.diffDays;
-          
-          let weekIndex;
-          if (diffDays <= 7) weekIndex = 3;
-          else if (diffDays <= 14) weekIndex = 2;
-          else if (diffDays <= 21) weekIndex = 1;
-          else if (diffDays <= 28) weekIndex = 0;
-          else return; 
-
-          if (detailTrx.items) {
-            detailTrx.items.forEach(item => {
-              const { productName, quantity } = item;
-              
-              if (!weeklyProductData[productName]) {
-                weeklyProductData[productName] = [0, 0, 0, 0];
-              }
-              
-              weeklyProductData[productName][weekIndex] += quantity;
-            });
+          if (diff <= 28) {
+            last28Days.push({ id: trx.transactionId, diff });
           }
         });
 
-        // 7. Ubah data menjadi format series ApexCharts
-        const finalSeries = Object.keys(weeklyProductData).map(productName => {
-          return {
-            name: productName,
-            data: weeklyProductData[productName]
-          };
+        if (last28Days.length === 0) {
+          setSeries([]);
+          setLoading(false);
+          return;
+        }
+
+        // 3. Detail transaksi
+        const detailPromises = last28Days.map(t =>
+          fetch(`http://127.0.0.1:5000/api/transaction/${t.id}`, fetchOptions)
+            .then(r => r.json())
+        );
+
+        const detailed = await Promise.all(detailPromises);
+
+        // 4. Proses data
+        const weeklyData = {};
+
+        detailed.forEach((detail, idx) => {
+          const diff = last28Days[idx].diff;
+
+          let week;
+          if (diff <= 7) week = 3;
+          else if (diff <= 14) week = 2;
+          else if (diff <= 21) week = 1;
+          else week = 0;
+
+          detail.items?.forEach(item => {
+            const w = weightMap.get(item.productName);
+            if (w === undefined) return;
+
+            if (!weeklyData[w]) weeklyData[w] = [0, 0, 0, 0];
+
+            weeklyData[w][week] += Number(item.subtotal);
+          });
         });
+
+        const finalSeries = Object.keys(weeklyData).map(weight => ({
+          name: `${weight} kg`,
+          data: weeklyData[weight]
+        }));
 
         setSeries(finalSeries);
 
       } catch (err) {
-        console.error("Error fetching chart data:", err);
+        console.error(err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -170,12 +150,11 @@ export default function ChartGaris() {
     };
 
     fetchChartData();
-  }, [token]); 
+  }, [token]);
 
-  // Tampilkan status loading atau error
   if (loading) {
     return (
-      <div className="flex h-[350px] w-full items-center justify-center rounded-lg bg-gray-50">
+      <div className="flex h-[350px] items-center justify-center bg-gray-50 rounded-lg">
         <p className="text-gray-500">Memuat data chart...</p>
       </div>
     );
@@ -183,21 +162,15 @@ export default function ChartGaris() {
 
   if (error) {
     return (
-      <div className="flex h-[350px] w-full items-center justify-center rounded-lg bg-red-50">
-        <p className="text-red-600">Error: {error}</p>
+      <div className="flex h-[350px] items-center justify-center bg-red-50 rounded-lg">
+        <p className="text-red-600">Error. {error}</p>
       </div>
     );
   }
 
-  // Tampilkan chart
   return (
     <div className="">
-      <Chart
-        options={chartOptions}
-        series={series}
-        type="line"
-        height={350}
-      />
+      <Chart options={chartOptions} series={series} type="bar" height={350} />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import GambarBeras from "../assets/gambar/beras.jpeg";
 
-const ListProduk = ({ cart, setCart,pilihStatus }) => {
+const ListProduk = ({ cart, setCart, pilihStatus }) => {
   const [produkList, setProdukList] = useState([]);
 
   useEffect(() => {
@@ -12,18 +12,19 @@ const ListProduk = ({ cart, setCart,pilihStatus }) => {
           alert("Token tidak ada, silakan login ulang");
           return;
         }
-let url = "http://127.0.0.1:5000/api/products/";
+
+        let url = "http://127.0.0.1:5000/api/products/?limit=9999";
 
         // Jika ada filter yang dipilih, tambahkan sebagai query parameter
         // (Saya asumsikan API Anda menggunakan 'weight' untuk filter kg)
-        if (pilihStatus) {
-          url += `?weight=${pilihStatus}`;
+        if (pilihStatus && pilihStatus !== "all") {
+          url += `&weight=${pilihStatus}`;
         }
+
         const res = await fetch(url, {
           method: "GET",
           credentials: "include",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
@@ -76,8 +77,8 @@ let url = "http://127.0.0.1:5000/api/products/";
           nama: produk.productName,
           harga: Number(produk.sellPrice),
           jumlah: 1,
-          imgPath: produk.imgPath, 
-          kategori: produk.weight + " kg", 
+          imgPath: produk.imgPath,
+          kategori: produk.weight + " kg",
         },
       ]);
     }
@@ -110,10 +111,7 @@ let url = "http://127.0.0.1:5000/api/products/";
               <section className="text-right ">
                 <p className="text-gray-700">{produk.productName}</p>
                 <p className="text-gray-700">{produk.weight} kg</p>
-                <p
-                  className="font-semibold "
-                
-                >
+                <p className="font-semibold ">
                   {produk.currentStock < 1
                     ? "Habis"
                     : `${produk.currentStock} `}
