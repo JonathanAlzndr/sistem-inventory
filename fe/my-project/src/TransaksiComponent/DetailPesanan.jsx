@@ -8,8 +8,7 @@ function DetailPesanan({ isOpen, onClose, transactionId }) {
   useEffect(() => {
     if (!isOpen || !transactionId) return;
 
-    // Nama fungsi diubah agar lebih jelas
-    const fetchDetailsWithWeight = async () => {
+    const fetchTransactionDetails = async () => {
       setLoading(true);
       setError(null);
       try {
@@ -17,50 +16,20 @@ function DetailPesanan({ isOpen, onClose, transactionId }) {
         const headers = {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-        };
+        }; // HANYA PANGGIL 1 API: Ambil detail transaksi (yang sekarang sudah menyertakan weight)
 
-        // --- LANGKAH 1: Buat panggilan API paralel ---
-        const [resTransaction, resProducts] = await Promise.all([
-          // Panggilan 1: Ambil detail transaksi
-          fetch(`http://127.0.0.1:5000/api/transaction/${transactionId}`, { headers }),
-          // Panggilan 2: Ambil SEMUA produk untuk 'kamus' berat
-          fetch("http://127.0.0.1:5000/api/products/?limit=1000&offset=0", { headers })
-        ]);
+        const resTransaction = await fetch(
+          `http://127.0.0.1:5000/api/transaction/${transactionId}`,
+          { headers }
+        );
 
         if (!resTransaction.ok) {
           throw new Error(`Gagal fetch transaksi: ${resTransaction.status}`);
         }
-        if (!resProducts.ok) {
-          throw new Error(`Gagal fetch produk: ${resProducts.status}`);
-        }
 
-        const dataTransaction = await resTransaction.json();
-        const dataProducts = await resProducts.json();
+        const dataTransaction = await resTransaction.json(); // Langsung set state dengan data dari transaksi
 
-        // --- LANGKAH 2: Buat 'kamus' berat (Map) ---
-        // Ini akan jadi: { "Beras A": 10, "Beras B": 5, ... }
-        const productWeightMap = new Map();
-        dataProducts.productList.forEach(p => {
-          productWeightMap.set(p.productName, p.weight);
-        });
-
-        // --- LANGKAH 3: "Enrich" (Perkaya) data 'items' dengan 'weight' ---
-        const enrichedItems = dataTransaction.items.map(item => {
-          // Cari 'weight' dari kamus
-          const weight = productWeightMap.get(item.productName) || 'N/A'; // 'N/A' jika tidak ketemu
-          
-          return {
-            ...item, // Salin data item (productName, quantity, subtotal)
-            weight: weight // Tambahkan field 'weight' yang hilang
-          };
-        });
-        
-        // --- LANGKAH 4: Set state dengan data yang sudah diperkaya ---
-        setTransaction({
-          ...dataTransaction, // Salin data transaksi (transactionId, customerName, dll)
-          items: enrichedItems // Ganti 'items' dengan 'items' baru yang sudah ada 'weight'-nya
-        });
-
+        setTransaction(dataTransaction);
       } catch (err) {
         console.error(err);
         setError(err.message || "Terjadi kesalahan");
@@ -69,8 +38,8 @@ function DetailPesanan({ isOpen, onClose, transactionId }) {
       }
     };
 
-    fetchDetailsWithWeight();
-  }, [isOpen, transactionId]); // Dependency tetap sama
+    fetchTransactionDetails();
+  }, [isOpen, transactionId]);
 
   if (!isOpen) return null;
 
@@ -85,7 +54,9 @@ function DetailPesanan({ isOpen, onClose, transactionId }) {
       >
         {/* Header */}
         <div className="p-6 pb-4">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Detail Pesanan</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            Detail Pesanan
+          </h2>
           <hr className="border-gray-200" />
         </div>
 
@@ -100,29 +71,47 @@ function DetailPesanan({ isOpen, onClose, transactionId }) {
               {/* Info Transaksi */}
               <div className="flex mb-5">
                 <div>
-                  <p className="font-medium text-gray-500 uppercase tracking-wider">Nomor Transaksi</p>
-                  <p className="text-base font-semibold text-gray-900">T-{transaction.transactionId}</p>
+                  <p className="font-medium text-gray-500 uppercase tracking-wider">
+                    Nomor Transaksi
+                  </p>
+                  <p className="text-base font-semibold text-gray-900">
+                    T-{transaction.transactionId}
+                  </p>
 
                   <div className="mt-2">
-                    <p className="font-medium text-gray-500 uppercase tracking-wider">Nama Pemesan</p>
-                    <p className="text-base font-semibold text-gray-900">{transaction.customerName}</p>
+                    <p className="font-medium text-gray-500 uppercase tracking-wider">
+                      Nama Pemesan
+                    </p>
+                    <p className="text-base font-semibold text-gray-900">
+                      {transaction.customerName}
+                    </p>
                   </div>
                 </div>
                 <div className="flex-1" />
                 <div>
-                  <p className="font-medium text-gray-500 uppercase tracking-wider">Tanggal</p>
-                  <p className="text-base font-semibold text-gray-900">
-                    {new Date(transaction.transactionDate).toLocaleDateString("id-ID")}
+                  <p className="font-medium text-gray-500 uppercase tracking-wider">
+                    Tanggal
                   </p>
-                  <p className="font-medium text-gray-500 uppercase tracking-wider mt-4">Waktu</p>
                   <p className="text-base font-semibold text-gray-900">
-                    {new Date(transaction.transactionDate).toLocaleTimeString("id-ID")}
+                    {new Date(transaction.transactionDate).toLocaleDateString(
+                      "id-ID"
+                    )}
+                  </p>
+                  <p className="font-medium text-gray-500 uppercase tracking-wider mt-4">
+                    Waktu
+                  </p>
+                  <p className="text-base font-semibold text-gray-900">
+                    {new Date(transaction.transactionDate).toLocaleTimeString(
+                      "id-ID"
+                    )}
                   </p>
                 </div>
               </div>
 
               <hr className="border-gray-200 mb-4" />
-              <h3 className="text-lg font-bold text-gray-800 mb-3">Daftar Item Pesanan</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-3">
+                Daftar Item Pesanan
+              </h3>
 
               {/* Tabel */}
               <div className="w-full flex flex-col min-h-0 flex-1">
@@ -143,10 +132,16 @@ function DetailPesanan({ isOpen, onClose, transactionId }) {
                         index % 2 === 1 ? "bg-gray-50" : ""
                       }`}
                     >
-                      <div className="col-span-5 text-gray-800">{item.productName}</div>
+                      <div className="col-span-5 text-gray-800">
+                        {item.productName}
+                      </div>
                       {/* Baris ini sekarang akan berfungsi! */}
-                      <div className="col-span-2 text-gray-800">{item.weight} kg</div>
-                      <div className="col-span-2 text-gray-800">{item.quantity}</div>
+                      <div className="col-span-2 text-gray-800">
+                        {item.weight} kg
+                      </div>
+                      <div className="col-span-2 text-gray-800">
+                        {item.quantity}
+                      </div>
                       <div className="col-span-3 text-gray-800 font-medium text-right">
                         Rp.{Number(item.subtotal).toLocaleString("id-ID")}
                       </div>
@@ -158,7 +153,9 @@ function DetailPesanan({ isOpen, onClose, transactionId }) {
               {/* Total */}
               <div className="pt-4 border-t border-gray-200 flex-shrink-0">
                 <div className="flex justify-between items-center border border-gray-300 p-4 rounded-md">
-                  <span className="text-base font-bold text-gray-900">Total Bayar</span>
+                  <span className="text-base font-bold text-gray-900">
+                    Total Bayar
+                  </span>
                   <span className="text-xl font-bold text-gray-900">
                     Rp.{Number(transaction.totalPrice).toLocaleString("id-ID")}
                   </span>
@@ -166,7 +163,9 @@ function DetailPesanan({ isOpen, onClose, transactionId }) {
               </div>
             </>
           ) : (
-            <p className="text-center text-gray-500">Belum ada data transaksi</p>
+            <p className="text-center text-gray-500">
+              Belum ada data transaksi
+            </p>
           )}
         </div>
 

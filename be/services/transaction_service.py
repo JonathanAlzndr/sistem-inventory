@@ -7,6 +7,52 @@ from repositories.product_repository import get_product_by_id
 from repositories.sale_repository import get_all_transaction, get_transaction_detail_by_id
 from models import Sale, OrderDetail
 
+
+def retur_transaction_service(sale_id: int):
+    """
+    Memproses retur transaksi. Ini akan:
+    1. Mengubah status transaksi (misalnya menjadi 'RETURNED').
+    2. Mengembalikan stok produk yang ada di OrderDetail ke tabel Product.
+    """
+    sale_to_retur = get_transaction_detail_by_id(sale_id)
+
+    if not sale_to_retur:
+        raise TransactionNotFound(msg="Transaction not found, cannot retur")
+
+    # Opsional: Cek status, pastikan transaksi belum pernah diretur/dihapus
+    # Jika Anda memiliki kolom 'status' di model Sale
+    # if sale_to_retur.status == 'RETURNED':
+    #     raise ValidationError(msg="Transaction has already been returned")
+
+    try:
+        # 1. Kembalikan stok
+        for detail in sale_to_retur.order_details:
+            product = detail.product 
+            if product:
+                # Tambahkan stok kembali ke currentStock
+                product.currentStock += detail.quantity
+                db.session.add(product) 
+        
+        # 2. Opsional: Ganti status transaksi (Perlu kolom 'status' di model Sale)
+        # Jika Anda tidak ingin menghapus/mengubah status, Anda mungkin ingin 
+        # menandai transaksi ini agar tidak bisa diretur lagi. 
+        # Karena model Sale Anda tidak memiliki kolom status, kita hanya 
+        # melakukan pembaruan stok. Namun, sebaiknya tambahkan kolom status 
+        # di model Sale jika retur adalah proses permanen.
+
+        # 3. Commit perubahan
+        db.session.commit()
+        
+        return True
+
+    except Exception as e:
+        db.session.rollback()
+        raise e
+
+
+
+# tess end
+
 def create_new_transaction_service(items_list, cashier_id, customer_name):
     cashier = get_user_by_id(cashier_id)
     
@@ -109,7 +155,8 @@ def get_transaction_detail_service(sale_id: int):
             "productName": detail.product.productName,
             "sellPrice": str(detail.product.sellPrice), 
             "quantity": detail.quantity,
-            "subtotal": str(detail.subTotal) 
+            "subtotal": str(detail.subTotal),
+            "weight": detail.product.weight
         })
 
     receipt = {

@@ -5,9 +5,28 @@ from flask import Blueprint, request, jsonify, url_for
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from decimal import Decimal
 from datetime import datetime
-from services.transaction_service import create_new_transaction_service, get_all_transactions_service, get_transaction_detail_service, delete_transaction_service
+from services.transaction_service import create_new_transaction_service, get_all_transactions_service, get_transaction_detail_service, delete_transaction_service, retur_transaction_service
 
 transaction_bp = Blueprint('transaction', __name__, url_prefix='/api/transaction')
+
+# fitur retur barang 
+@transaction_bp.route('/<int:transactionId>/retur', methods=['PATCH']) # <-- Route baru
+@jwt_required()
+@roles_required("Cashier") # Hanya Cashier yang boleh retur
+def retur_transaction(transactionId):
+
+    try:       
+        retur_transaction_service(transactionId)
+        return jsonify(msg="Success to retur transaction, stock restored"), 200
+
+    except TransactionNotFound as e:
+            return jsonify(msg=str(e)), 404
+    except ValidationError as e:
+            return jsonify(msg=str(e)), 400
+    except Exception as e:
+            return jsonify(msg=f"Internal server error: {str(e)}"), 500
+
+# fitur retur barang end 
 
 @transaction_bp.route('/', methods=['POST'])
 @jwt_required()

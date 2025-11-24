@@ -8,6 +8,7 @@ import DeleteKonfirmasi from "./DeleteKonfirmasi";
 import { toast } from "react-toastify";
 import Loading from "../kecilComponent/Loading";
 import { FaRepeat } from "react-icons/fa6";
+import ReturKonfirmasi from "../kecilComponent/ReturKonfirmasi";
 
 const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
   const [transactionList, setTransactionList] = useState([]);
@@ -19,8 +20,8 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
 
-  // const [showReturModal, setShowReturModal] = useState(false);
-  // const [idToRetur, setIdToRetur] = useState(null);
+  const [showReturModal, setShowReturModal] = useState(false);
+  const [idToRetur, setIdToRetur] = useState(null);
 
   useEffect(() => {
     const fetchTransaksi = async () => {
@@ -111,52 +112,52 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
     setIdToDelete(null);
   };
 
-// const executeRetur = async (password) => {
-//   if (!password) {
-//     toast.warn("Password tidak boleh kosong!");
-//     return;
-//   }
+const executeRetur = async (password) => {
+  if (!password) {
+    toast.warn("Password tidak boleh kosong!");
+    return;
+  }
 
-//   setShowReturModal(false);
-//   setIsActionLoading(true);
+  setShowReturModal(false);
+  setIsActionLoading(true);
 
-//   const minDelay = new Promise((resolve) => setTimeout(resolve, 500));
+  const minDelay = new Promise((resolve) => setTimeout(resolve, 500));
 
-//   try {
-//     const token = localStorage.getItem("token");
+  try {
+    const token = localStorage.getItem("token");
 
-//     const res = await fetch(
-//       `http://127.0.0.1:5000/api/transaction/retur/${idToRetur}`,
-//       {
-//         method: "PATCH",
-//         credentials: "include",
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({ password }),
-//       }
-//     );
+    const res = await fetch(
+      `http://127.0.0.1:5000/api/transaction/${idToRetur}/retur`,
+      {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }),
+      }
+    );
 
-//     if (!res.ok) {
-//       const errorData = await res.json();
-//       throw new Error(errorData.msg || "Gagal memproses retur");
-//     }
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.msg || "Gagal memproses retur");
+    }
 
-//     // update list transaksi
-//     setTransactionList((prev) =>
-//       prev.filter((trx) => trx.transactionId !== idToRetur)
-//     );
+    // update list transaksi
+    setTransactionList((prev) =>
+      prev.filter((trx) => trx.transactionId !== idToRetur)
+    );
 
-//     toast.success("Retur berhasil. Stok dikembalikan.");
-//   } catch (err) {
-//     toast.error(err.message);
-//   } finally {
-//     await minDelay;
-//     setIsActionLoading(false);
-//     setIdToRetur(null);
-//   }
-// };
+    toast.success("Retur berhasil. Stok dikembalikan.");
+  } catch (err) {
+    toast.error(err.message);
+  } finally {
+    await minDelay;
+    setIsActionLoading(false);
+    setIdToRetur(null);
+  }
+};
 
 
   //3. FUNGSI HANDLEEXPORT
@@ -270,7 +271,7 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
             </tr>
           </thead>
 
-          <tbody className="text-center">
+          <tbody className="text-center ">
             {transactionList.map((trx, index) => (
               <tr key={trx.transactionId} className="hover:bg-gray-50">
                 <td className="border-t border-gray-200 px-3 py-2">
@@ -313,7 +314,7 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
                 </td>
 
                 <td className="border-t border-gray-200  flex justify-center py-2">
-                  {/* <button
+                  <button
                     onClick={() => {
                       setIdToRetur(trx.transactionId);
                       setShowReturModal(true);
@@ -321,7 +322,7 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
                     className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 transition"
                   >
                     <FaRepeat className="text-green-500 hover:text-green-700" />
-                  </button> */}
+                  </button>
 
                   <button
                     onClick={() => {
@@ -348,13 +349,13 @@ const TableTransaksi = ({ refreshTrigger, setExportHandler }) => {
         />
       )}
 
-      {/* {showReturModal && (
+      {showReturModal && (
         <ReturKonfirmasi
           isOpen={showReturModal}
           onClose={() => setShowReturModal(false)}
           onConfirm={executeRetur}
         />
-      )} */}
+      )}
 
       {/* Modal Konfirmasi Hapus */}
       {showDeleteModal && (
